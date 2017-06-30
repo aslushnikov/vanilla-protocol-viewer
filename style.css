@@ -82,6 +82,7 @@ code {
   bottom: 0;
   right: 0;
   overflow-y: scroll;
+  border-top: 2px solid rgba(51, 51, 51, 0.52);
 }
 
 #content {
@@ -231,6 +232,7 @@ span.experimental {
   padding: 4px 10px;
   align-items: center;
   cursor: pointer;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.12);
 }
 
 #sresults .search-item:hover {
