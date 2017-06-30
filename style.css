@@ -1,3 +1,9 @@
+:root {
+  --sidebar-width: 256px;
+  --search-height: 50px;
+  --hover-color: rgba(225, 245, 254, 0.49);
+}
+
 body {
   color: #333;
   background-color: #fafafa;
@@ -8,6 +14,13 @@ body {
 
 p {
   margin: 0.5rem 0 1rem;
+}
+
+h4 {
+  /* use padding to make sure element has some space on top when
+   * scrollIntoViewportIfNeede() is called */
+  margin-top: 0;
+  padding-top: 1.33em;
 }
 
 h5 {
@@ -21,11 +34,6 @@ h5 {
 code {
   font-family: Consolas, Menlo, monospace;
   color: #9C27B0;
-}
-
-:root {
-  --sidebar-width: 256px;
-  --search-height: 50px;
 }
 
 #sidebar {
@@ -57,8 +65,9 @@ code {
 }
 
 #search input {
+  text-align: center;
   border: none;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.52);
   padding: 0 20px 3px 20px;
   font-size: 20px;
   color: #333;
@@ -66,7 +75,7 @@ code {
 
 #sresults {
   display: none;
-  background-color: transparent;
+  background-color: #fff;
   position: absolute;
   left: var(--sidebar-width);
   top: var(--search-height);
@@ -83,6 +92,10 @@ code {
   bottom: 0;
   right: 0;
   overflow-y: scroll;
+}
+
+.boundary {
+  border-bottom: 1px solid rgba(51, 51, 51, 0.36);
 }
 
 .monospace {
@@ -161,7 +174,7 @@ code {
   opacity: .9;
 }
 
-.optional:after {
+.optional::after {
   content: "optional";
   opacity: .6;
   font-size: 70%;
@@ -207,5 +220,72 @@ span.experimental {
 }
 
 #sidebar .domain-link:hover {
-  background: hsl(0,0%, 98%);
+  background-color: var(--hover-color);
+}
+
+#sresults .search-item.selected {
+  background-color: #e3f2fd;
+}
+
+#sresults .search-item {
+  padding: 4px 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+#sresults .search-item:hover {
+  background-color: var(--hover-color);
+}
+
+#sresults .search-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  flex-grow: 0;
+  width: 20px;
+  height: 20px;
+  color: white;
+  margin: 10px 30px;
+  border-radius: 3px;
+  cursor: help;
+}
+
+.icon-method {
+  background-color: orange;
+}
+
+.icon-type {
+  background-color: blue;
+}
+
+.icon-event {
+  background-color: green;
+}
+
+#sresults .search-item-main {
+  flex: 1 1 auto;
+}
+
+#sresults .search-item-title {
+}
+
+#sresults .search-item-description {
+  font-size: 90%;
+}
+
+#sresults .search-item-domain {
+  flex: 0 1 auto;
+  text-align: right;
+  color: black;
+  word-wrap: break-word;
+  max-width: 250px;
+  margin: 10px 30px;
+}
+
+#sresults .search-item-domain::after {
+  content: "domain";
+  opacity: .6;
+  font-size: 70%;
+  display: block;
 }

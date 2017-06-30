@@ -12,6 +12,7 @@ async function main() {
   let allDomains = [];
   for (let protocol of protocols)
     allDomains.push(...protocol.domains);
+  var search = new Search(allDomains, document.getElementById('search'), document.getElementById('sresults'));
   let domains = new Map();
   for (let domain of allDomains)
     domains.set(domain.domain, domain);
@@ -30,6 +31,7 @@ async function main() {
     let [domain, method] = route.split('.');
     if (!domains.has(domain))
       return;
+    search.cancelSearch();
     var active = sidebar.querySelector('.active-link');
     if (active)
       active.classList.remove('active-link');
@@ -40,8 +42,13 @@ async function main() {
     content.innerHTML = '';
     let e = renderDomain(domains.get(domain));
     content.appendChild(e);
-    if (!method)
+    let elem = document.getElementById(route);
+    if (elem)
+      elem.scrollIntoView();
+    else if (!method)
       content.scrollTop = 0;
+    content.focus();
+    document.title = route;
   }
 }
 
@@ -77,6 +84,8 @@ function renderDomain(domain) {
     title.textContent = 'Methods';
     let container = main.box('box');
     for (let i = 0; i < domain.commands.length; ++i) {
+      if (i !== 0)
+        container.div('boundary');
       let method = domain.commands[i];
       container.appendChild(renderEventOrMethod(domain, method));
     }
@@ -88,6 +97,8 @@ function renderDomain(domain) {
     title.textContent = 'Events';
     let container = main.box('box');
     for (let i = 0; i < domain.events.length; ++i) {
+      if (i !== 0)
+        container.div('boundary');
       let event = domain.events[i];
       container.appendChild(renderEventOrMethod(domain, event));
     }
@@ -99,6 +110,8 @@ function renderDomain(domain) {
     title.textContent = 'Types';
     let container = main.box('box');
     for (let i = 0; i < domain.types.length; ++i) {
+      if (i !== 0)
+        container.div('boundary');
       let type = domain.types[i];
       container.appendChild(renderType(domain, type));
     }
