@@ -1,11 +1,14 @@
 document.addEventListener('DOMContentLoaded', main);
 
 async function main() {
+  let sidebar = document.getElementById('sidebar');
   let content = document.getElementById('content');
+
   let protocols = await Promise.all([
     fetch('./browser_protocol.json').then(r => r.json()),
     fetch('./js_protocol.json').then(r => r.json()),
   ]);
+
   let allDomains = [];
   for (let protocol of protocols)
     allDomains.push(...protocol.domains);
@@ -22,6 +25,15 @@ async function main() {
     if (!route)
       return;
     let [domain, method] = route.split('.');
+    if (!domains.has(domain))
+      return;
+    var active = sidebar.querySelector('.active-link');
+    if (active)
+      active.classList.remove('active-link');
+    let link = sidebar.querySelector(`[href='#${domain}']`);
+    if (link)
+      link.classList.add('active-link');
+
     let e = renderDomain(domains.get(domain));
     content.innerHTML = '';
     content.appendChild(e);

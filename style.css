@@ -166,6 +166,10 @@ span.experimental {
   padding: 0 16px;
 }
 
+#sidebar .active-link {
+  border-right: 5px solid #4bbda8;
+}
+
 #sidebar .domain-link:hover {
   background: hsl(0,0%, 98%);
 }
