@@ -20,12 +20,12 @@ h5 {
 
 code {
   font-family: Consolas, Menlo, monospace;
-  border-left: 1px solid #333;
-  border-right: 1px solid #333;
+  color: #9C27B0;
 }
 
 :root {
   --sidebar-width: 256px;
+  --search-height: 50px;
 }
 
 #sidebar {
@@ -36,15 +36,51 @@ code {
   bottom: 0;
   left: 0;
   overflow-y: scroll;
+  border-right: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+#search {
+  background: #fff;
+  position: absolute;
+  left: var(--sidebar-width);
+  right: 0;
+  top: 0;
+  height: var(--search-height);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#search input:focus {
+  outline: none;
+}
+
+#search input {
+  border: none;
+  border-bottom: 1px solid black;
+  padding: 0 20px 3px 20px;
+  font-size: 20px;
+  color: #333;
+}
+
+#sresults {
+  display: none;
+  background-color: transparent;
+  position: absolute;
+  left: var(--sidebar-width);
+  top: var(--search-height);
+  bottom: 0;
+  right: 0;
+  overflow-y: scroll;
 }
 
 #content {
-  border-left: 1px solid rgba(0, 0, 0, 0.14);
   background-color: #fafafa;
   position: absolute;
   left: var(--sidebar-width);
-  top: 00px;
-  bottom: 0px;
+  top: var(--search-height);
+  bottom: 0;
   right: 0;
   overflow-y: scroll;
 }
