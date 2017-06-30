@@ -289,3 +289,7 @@ span.experimental {
   font-size: 70%;
   display: block;
 }
+
+.search-highlight {
+  background-color: yellow;
+}
