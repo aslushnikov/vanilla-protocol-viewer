@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', main);
 
 async function main() {
+  let content = document.getElementById('content');
   let protocols = await Promise.all([
     fetch('./browser_protocol.json').then(r => r.json()),
     fetch('./js_protocol.json').then(r => r.json()),
@@ -11,8 +12,6 @@ async function main() {
   let domains = new Map();
   for (let domain of allDomains)
     domains.set(domain.domain, domain);
-  let e = renderDomain(domains.get('Network'));
-  document.body.appendChild(e);
 
   doRoute();
   window.addEventListener("popstate", doRoute);
@@ -23,12 +22,17 @@ async function main() {
       return;
     let [domain, method] = route.split('.');
     let e = renderDomain(domains.get(domain));
-    document.body.innerHTML = '';
-    document.body.appendChild(e);
-    var elem = document.getElementById(route);
+    content.innerHTML = '';
+    content.appendChild(e);
+    let elem = document.getElementById(route);
     if (elem)
       elem.scrollIntoView();
   }
+}
+
+function renderSidebar(domainNames) {
+  domainNames.sort();
+
 }
 
 function renderDomain(domain) {
