@@ -267,6 +267,7 @@ span.experimental {
 
 #sresults .search-item-main {
   flex: 1 1 auto;
+  max-width: 1000px;
 }
 
 #sresults .search-item-title {
