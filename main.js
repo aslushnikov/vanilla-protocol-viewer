@@ -18,6 +18,9 @@ async function main() {
   renderSidebar(Array.from(domains.keys()));
 
   doRoute();
+  let elem = document.getElementById(window.location.hash.substring(1));
+  if (elem)
+    elem.scrollIntoView();
   window.addEventListener("popstate", doRoute);
 
   function doRoute() {
@@ -34,13 +37,10 @@ async function main() {
     if (link)
       link.classList.add('active-link');
 
-    let e = renderDomain(domains.get(domain));
     content.innerHTML = '';
+    let e = renderDomain(domains.get(domain));
     content.appendChild(e);
-    let elem = document.getElementById(route);
-    if (elem)
-      elem.scrollIntoView();
-    else
+    if (!method)
       content.scrollTop = 0;
   }
 }
@@ -66,7 +66,7 @@ function renderDomain(domain) {
     title.textContent = domain.domain;
 
     let description = container.el('p');
-    description.innerHTML = domain.description;
+    description.innerHTML = domain.description || '';
     if (domain.experimental)
       description.appendChild(experimentalMark());
   }
@@ -113,7 +113,7 @@ function renderType(domain, type) {
   {
     // Render description.
     let p = main.el('p');
-    p.textContent = type.description;
+    p.textContent = type.description || '';
     if (type.experimental)
       p.appendChild(experimentalMark());
   }
@@ -159,7 +159,7 @@ function renderEventOrMethod(domain, method) {
   {
     // Render description.
     let p = main.el('p');
-    p.innerHTML = method.description;
+    p.innerHTML = method.description || '';
     if (method.experimental)
       p.appendChild(experimentalMark());
   }
@@ -196,7 +196,7 @@ function renderParameter(domain, parameter) {
     let container = main.vbox('parameter-value');
     container.appendChild(renderTypeLink(domain, parameter));
     let description = container.span('parameter-description');
-    description.innerHTML = parameter.description;
+    description.innerHTML = parameter.description || '';
     if (parameter.experimental)
       description.appendChild(experimentalMark());
   }
