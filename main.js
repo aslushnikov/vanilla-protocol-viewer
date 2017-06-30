@@ -11,6 +11,8 @@ async function main() {
   let domains = new Map();
   for (let domain of allDomains)
     domains.set(domain.domain, domain);
+  for (var domain of allDomains)
+    renderDomain(domain);
   let e = renderDomain(domains.get('Network'));
   document.body.appendChild(e);
 }
@@ -86,7 +88,7 @@ function renderType(domain, type) {
     title.textContent = 'Properties';
     let container = main.el('dl', 'parameter-list');
     for (let parameter of type.properties)
-      container.appendChild(renderParameter(parameter));
+      container.appendChild(renderParameter(domain, parameter));
   }
   return main;
 }
@@ -113,7 +115,7 @@ function renderMethod(domain, method) {
     title.textContent = 'Parameters';
     let container = main.el('dl', 'parameter-list');
     for (let parameter of method.parameters)
-      container.appendChild(renderParameter(parameter));
+      container.appendChild(renderParameter(domain, parameter));
   }
   if (method.returns && method.returns.length) {
     // Render return values.
@@ -121,12 +123,12 @@ function renderMethod(domain, method) {
     title.textContent = 'RETURN OBJECT';
     let container = main.el('dl', 'parameter-list');
     for (let parameter of method.returns)
-      container.appendChild(renderParameter(parameter));
+      container.appendChild(renderParameter(domain, parameter));
   }
   return main;
 }
 
-function renderParameter(parameter) {
+function renderParameter(domain, parameter) {
   let main = E.hbox('parameter');
   {
     // Render parameter name.
@@ -138,7 +140,7 @@ function renderParameter(parameter) {
   {
     // Render parameter value.
     let container = main.vbox('parameter-value');
-    container.appendChild(renderTypeLink(parameter));
+    container.appendChild(renderTypeLink(domain, parameter));
     let description = container.addText(parameter.description, 'parameter-description');
     if (parameter.experimental)
       description.appendChild(experimentalMark());
@@ -146,7 +148,34 @@ function renderParameter(parameter) {
   return main;
 }
 
-function renderTypeLink(parameter) {
+var primitiveTypes = new Set([
+  "string",
+  "integer",
+  "boolean",
+  "number",
+  "object",
+  "any"
+]);
+
+function renderTypeLink(domain, parameter) {
+  if (primitiveTypes.has(parameter.type))
+    return E.text(parameter.type, 'parameter-type');
+  if (parameter.$ref) {
+    let a = E.el('a', 'parameter-type');
+    if (parameter.$ref.includes('.'))
+      a.href = '/types/' + parameter.$ref;
+    else
+      a.href = '/types/' + domain.domain + '.' + parameter.$ref;
+    a.textContent = parameter.$ref;
+    return a;
+  }
+  if (parameter.type === 'array') {
+    let generic = E.span('parameter-type');
+    generic.addText('array [ ');
+    generic.appendChild(renderTypeLink(domain, parameter.items));
+    generic.addText(' ]');
+    return generic;
+  }
   return E.text('<TYPE>', 'parameter-type');
 }
 
