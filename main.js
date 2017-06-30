@@ -14,7 +14,10 @@ async function main() {
   let sidebar = document.getElementById('sidebar');
   let content = document.getElementById('content');
 
+  let startLoading = Date.now();
   let protocols = await Promise.all(Object.values(PROTOCOLS).map(url => fetch(url).then(r => r.json())));
+  let endLoading = Date.now();
+  let loadingTime = endLoading - startLoading;
 
   let allDomains = [];
   for (let protocol of protocols)
@@ -42,13 +45,17 @@ async function main() {
     let route = (window.location.hash || '#').substring(1);
     if (!route) {
       content.innerHTML = '';
-      let e = renderLanding();
+      let e = renderLanding(loadingTime, protocols);
       content.appendChild(e);
       return;
     }
     let [domain, method] = route.split('.');
-    if (!domains.has(domain))
+    if (!domains.has(domain)) {
+      content.innerHTML = '';
+      let e = renderError('Unknown location: ' + route);
+      content.appendChild(e);
       return;
+    }
     search.cancelSearch();
     var active = sidebar.querySelector('.active-link');
     if (active)
@@ -184,7 +191,6 @@ function renderTitle(domainName, domainEntry) {
 }
 
 function renderEventOrMethod(domain, method) {
-  //let main = document.createDocumentFragment();//E.vbox('method');
   let main = E.div('method');
   main.appendChild(renderTitle(domain.domain, method.name));
   {
@@ -271,21 +277,39 @@ function experimentalMark() {
   return e;
 }
 
-function renderLanding() {
+function renderError(error) {
+  let main = E.div();
+  {
+    let e = main.box();
+    let h2 = e.el('h2');
+    h2.addText('Error');
+    let p = e.el('p');
+    p.addText(error);
+  }
+  return main;
+}
+
+function renderLanding(loadingTime, protocols) {
   let main = E.div();
   {
     let e = main.box();
     let h2 = e.el('h2');
     h2.textContent = 'Vanilla Protocol Viewer';
     let div = e.div();
-    div.addText('Loaded protocols:');
+    div.addText('Protocols fetched from ');
+    div.a('ChromeDevTools/devtools-protocol', 'https://github.com/ChromeDevTools/devtools-protocol');
+    div.addText(' in ' + (((loadingTime * 1000)|0) / 1000) + 'ms:');
     let ul = div.el('ul');
+    var protocolNames = Object.keys(PROTOCOLS);
+    protocols = protocols.slice();
     for (let protocolName in PROTOCOLS) {
       let li = ul.el('li');
       let a = li.el('a');
       a.href = PROTOCOLS[protocolName];
       a.textContent = protocolName;
       a.target = '_blank';
+      let protocol = protocols.shift();
+      li.addText(` v${protocol.version.major}.${protocol.version.minor}`);
     }
   }
   {
