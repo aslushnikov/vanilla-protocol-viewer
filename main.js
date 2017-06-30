@@ -12,6 +12,7 @@ async function main() {
   let domains = new Map();
   for (let domain of allDomains)
     domains.set(domain.domain, domain);
+  renderSidebar(Array.from(domains.keys()));
 
   doRoute();
   window.addEventListener("popstate", doRoute);
@@ -27,12 +28,19 @@ async function main() {
     let elem = document.getElementById(route);
     if (elem)
       elem.scrollIntoView();
+    else
+      content.scrollTop = 0;
   }
 }
 
 function renderSidebar(domainNames) {
   domainNames.sort();
-
+  let sidebar = document.getElementById('sidebar');
+  for (let name of domainNames) {
+    let a = sidebar.el('a', 'domain-link');
+    a.href = '#' + name;
+    a.textContent = name;
+  }
 }
 
 function renderDomain(domain) {
@@ -47,6 +55,8 @@ function renderDomain(domain) {
 
     let description = container.el('p');
     description.textContent = domain.description;
+    if (domain.experimental)
+      description.appendChild(experimentalMark());
   }
 
   if (domain.commands && domain.commands.length) {
