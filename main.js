@@ -54,7 +54,7 @@ function renderDomain(domain) {
     title.textContent = domain.domain;
 
     let description = container.el('p');
-    description.textContent = domain.description;
+    description.innerHTML = domain.description;
     if (domain.experimental)
       description.appendChild(experimentalMark());
   }
@@ -97,16 +97,7 @@ function renderDomain(domain) {
 
 function renderType(domain, type) {
   let main = E.div('type');
-  {
-    // Render heading.
-    let heading = main.el('h4', 'monospace');
-    heading.textContent = type.id;
-    let id = `${domain.domain}.${type.id}`;
-    heading.setAttribute('id', id);
-    let ref = heading.el('a', 'title-link');
-    ref.href = '#' + id;
-    ref.textContent = '#';
-  }
+  main.appendChild(renderTitle(domain.domain, type.id));
   {
     // Render description.
     let p = main.el('p');
@@ -136,24 +127,27 @@ function renderType(domain, type) {
   return main;
 }
 
-function renderEventOrMethod(domain, method) {
-  //let main = document.createDocumentFragment();//E.vbox('method');
-  let main = E.div('method');
-  {
+function renderTitle(domainName, domainEntry) {
     // Render heading.
-    let heading = main.el('h4', 'monospace');
-    let id = `${domain.domain}.${method.name}`;
+    let heading = E.el('h4', 'monospace');
+    let id = `${domainName}.${domainEntry}`;
     heading.setAttribute('id', id);
-    heading.addText(domain.domain + '.', 'method-domain');
-    heading.addText(method.name, 'method-name');
+    heading.addText(domainName + '.', 'method-domain');
+    heading.addText(domainEntry, 'method-name');
     let ref = heading.el('a', 'title-link');
     ref.href = '#' + id;
     ref.textContent = '#';
-  }
+    return heading;
+}
+
+function renderEventOrMethod(domain, method) {
+  //let main = document.createDocumentFragment();//E.vbox('method');
+  let main = E.div('method');
+  main.appendChild(renderTitle(domain.domain, method.name));
   {
     // Render description.
     let p = main.el('p');
-    p.textContent = method.description;
+    p.innerHTML = method.description;
     if (method.experimental)
       p.appendChild(experimentalMark());
   }
@@ -189,7 +183,8 @@ function renderParameter(domain, parameter) {
     // Render parameter value.
     let container = main.vbox('parameter-value');
     container.appendChild(renderTypeLink(domain, parameter));
-    let description = container.addText(parameter.description, 'parameter-description');
+    let description = container.span('parameter-description');
+    description.innerHTML = parameter.description;
     if (parameter.experimental)
       description.appendChild(experimentalMark());
   }

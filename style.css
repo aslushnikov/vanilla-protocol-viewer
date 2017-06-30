@@ -18,6 +18,12 @@ h5 {
   margin: 1rem 0 0;
 }
 
+code {
+  font-family: Consolas, Menlo, monospace;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+}
+
 :root {
   --sidebar-width: 256px;
 }
