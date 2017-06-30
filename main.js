@@ -15,6 +15,16 @@ async function main() {
     renderDomain(domain);
   let e = renderDomain(domains.get('Network'));
   document.body.appendChild(e);
+
+  window.addEventListener("popstate", () => {
+    let route = (window.location.hash || '#').substring(1);
+    if (!route)
+      return;
+    let [domain, method] = route.split('.');
+    let e = renderDomain(domains.get(domain));
+    document.body.innerHTML = '';
+    document.body.appendChild(e);
+  });
 }
 
 function renderDomain(domain) {
@@ -68,12 +78,12 @@ function renderDomain(domain) {
 }
 
 function renderType(domain, type) {
-  //let main = document.createDocumentFragment();//E.vbox('method');
   let main = E.div('type');
   {
     // Render heading.
     let heading = main.el('h4', 'monospace');
-    heading.text = type.id;
+    heading.textContent = type.id;
+    heading.setAttribute('id', `${domain.domain}.${type.id}`);
   }
   {
     // Render description.
@@ -89,6 +99,17 @@ function renderType(domain, type) {
     let container = main.el('dl', 'parameter-list');
     for (let parameter of type.properties)
       container.appendChild(renderParameter(domain, parameter));
+  }
+  if (type.type) {
+    let container = main.el('p');
+    container.addText('Type: ');
+    container.addText(type.type, 'parameter-type');
+  }
+  if (type.enum) {
+    let title = main.el('h5');
+    title.textContent = 'Allowed values';
+    let p = main.el('p');
+    p.textContent = type.enum.join(', ');
   }
   return main;
 }
@@ -163,9 +184,9 @@ function renderTypeLink(domain, parameter) {
   if (parameter.$ref) {
     let a = E.el('a', 'parameter-type');
     if (parameter.$ref.includes('.'))
-      a.href = '/types/' + parameter.$ref;
+      a.href = '#' + parameter.$ref;
     else
-      a.href = '/types/' + domain.domain + '.' + parameter.$ref;
+      a.href = '#' + domain.domain + '.' + parameter.$ref;
     a.textContent = parameter.$ref;
     return a;
   }
