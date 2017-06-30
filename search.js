@@ -49,7 +49,7 @@ class Search {
         if (node === this._searchInput)
           return;
         if (node.classList.contains('search-item')) {
-          window.location.hash = node.__url;
+          window.revealHash(node.__url);
           return;
         }
         node = node.parentElement;
@@ -62,7 +62,7 @@ class Search {
     this._searchInput.blur();
     this._results.style.setProperty('display', 'none');
     this._searchInput.value = '';
-    document.body.focus();
+    document.getElementById('content').focus();
   }
 
   _onInput() {
@@ -99,7 +99,9 @@ class Search {
       } else if (event.key === "ArrowUp") {
           this._selectPrevious(event);
       } else if (event.key === "Enter") {
-          window.location.hash = this._selectedElement.__url;
+          event.consume();
+          this.cancelSearch();
+          window.revealHash(this._selectedElement.__url);
       }
   }
 

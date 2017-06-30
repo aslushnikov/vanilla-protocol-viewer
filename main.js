@@ -1,13 +1,15 @@
+let PROTOCOLS = {
+  'browser_protocol.json':  './browser_protocol.json',
+  'js_protocol.json':  './js_protocol.json',
+}
+
 document.addEventListener('DOMContentLoaded', main);
 
 async function main() {
   let sidebar = document.getElementById('sidebar');
   let content = document.getElementById('content');
 
-  let protocols = await Promise.all([
-    fetch('./browser_protocol.json').then(r => r.json()),
-    fetch('./js_protocol.json').then(r => r.json()),
-  ]);
+  let protocols = await Promise.all(Object.values(PROTOCOLS).map(url => fetch(url).then(r => r.json())));
 
   let allDomains = [];
   for (let protocol of protocols)
@@ -24,10 +26,21 @@ async function main() {
     elem.scrollIntoView();
   window.addEventListener("popstate", doRoute);
 
+  window.revealHash = function(hash) {
+    if (window.location.hash === hash)
+      doRoute();
+    else
+      window.location.hash = hash;
+  }
+
   function doRoute() {
     let route = (window.location.hash || '#').substring(1);
-    if (!route)
+    if (!route) {
+      content.innerHTML = '';
+      let e = renderLanding();
+      content.appendChild(e);
       return;
+    }
     let [domain, method] = route.split('.');
     if (!domains.has(domain))
       return;
@@ -253,6 +266,47 @@ function experimentalMark() {
   return e;
 }
 
+function renderLanding() {
+  let main = E.div();
+  {
+    let e = main.box();
+    let h2 = e.el('h2');
+    h2.textContent = '(Simple) DevTools Protocol Viewer';
+    let div = e.div();
+    div.addText('Loaded protocols:');
+    let ul = div.el('ul');
+    for (let protocolName in PROTOCOLS) {
+      let li = ul.el('li');
+      let a = li.el('a');
+      a.href = PROTOCOLS[protocolName];
+      a.textContent = protocolName;
+      a.target = '_blank';
+    }
+  }
+  {
+    e = main.box();
+    let h4 = e.el('h4');
+    h4.textContent = 'Why?';
+    let p = e.el('p');
+    p.textContent = 'Because there should be a protocol viewer which works on plane.';
+    h4 = e.el('h4');
+    h4.textContent = 'Features';
+    let ul = e.el('ul');
+    let li = ul.el('li');
+    li.code('Instant Search ');
+    li.addText('Start typing anywhere to initiate searching.');
+    li = ul.el('li');
+    li.code('Zero-Dependency ')
+    li.addText('This is a small self-contained project in less then 1000LOC.');
+    li = ul.el('li');
+    li.code('No Buildsteps ');
+    li.addText('Written in vanilla JavaScript / HTML / CSS.');
+    e.addText('Inspired by ');
+    e.a( 'Chrome DevTools Protocol Viewer', 'https://chromedevtools.github.io/devtools-protocol/');
+  }
+  return main;
+}
+
 // HELPERS
 
 class E {
@@ -330,6 +384,28 @@ Node.prototype.vbox = function(className) {
 Node.prototype.addText = function(text, className) {
   let t = E.text(text, className);
   this.appendChild(t);
+  return t;
+}
+
+Node.prototype.strong = function(text) {
+  let t = E.el('strong');
+  this.appendChild(t);
+  t.textContent = text;
+  return t;
+}
+
+Node.prototype.code = function(text) {
+  let t = E.el('code');
+  this.appendChild(t);
+  t.textContent = text;
+  return t;
+}
+
+Node.prototype.a = function(text, href) {
+  let t = E.el('a');
+  this.appendChild(t);
+  t.textContent = text;
+  t.href = href;
   return t;
 }
 
