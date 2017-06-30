@@ -87,7 +87,11 @@ function renderType(domain, type) {
     // Render heading.
     let heading = main.el('h4', 'monospace');
     heading.textContent = type.id;
-    heading.setAttribute('id', `${domain.domain}.${type.id}`);
+    let id = `${domain.domain}.${type.id}`;
+    heading.setAttribute('id', id);
+    let ref = heading.el('a', 'title-link');
+    ref.href = '#' + id;
+    ref.textContent = '#';
   }
   {
     // Render description.
@@ -124,9 +128,13 @@ function renderEventOrMethod(domain, method) {
   {
     // Render heading.
     let heading = main.el('h4', 'monospace');
-    heading.setAttribute('id', `${domain.domain}.${method.name}`);
+    let id = `${domain.domain}.${method.name}`;
+    heading.setAttribute('id', id);
     heading.addText(domain.domain + '.', 'method-domain');
     heading.addText(method.name, 'method-name');
+    let ref = heading.el('a', 'title-link');
+    ref.href = '#' + id;
+    ref.textContent = '#';
   }
   {
     // Render description.

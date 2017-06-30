@@ -99,6 +99,15 @@ h5 {
   display: block;
 }
 
+.title-link {
+  margin-left: 1ex;
+  display: none;
+}
+
+h4:hover .title-link {
+  display: inline;
+}
+
 span.experimental {
   font-size: 70%;
   text-transform: uppercase;
