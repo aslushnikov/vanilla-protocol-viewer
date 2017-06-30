@@ -62,6 +62,7 @@ class Search {
     this._searchInput.blur();
     this._results.style.setProperty('display', 'none');
     this._searchInput.value = '';
+    document.body.focus();
   }
 
   _onInput() {
