@@ -1,6 +1,11 @@
 let PROTOCOLS = {
+/**
+ * these could be pointing to local versions of protocol:
   'browser_protocol.json':  './browser_protocol.json',
   'js_protocol.json':  './js_protocol.json',
+ * */
+  'browser_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/browser_protocol.json',
+  'js_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json',
 }
 
 document.addEventListener('DOMContentLoaded', main);
@@ -271,7 +276,7 @@ function renderLanding() {
   {
     let e = main.box();
     let h2 = e.el('h2');
-    h2.textContent = '(Simple) DevTools Protocol Viewer';
+    h2.textContent = 'Vanilla Protocol Viewer';
     let div = e.div();
     div.addText('Loaded protocols:');
     let ul = div.el('ul');
@@ -286,10 +291,6 @@ function renderLanding() {
   {
     e = main.box();
     let h4 = e.el('h4');
-    h4.textContent = 'Why?';
-    let p = e.el('p');
-    p.textContent = 'Because there should be a protocol viewer which works on plane.';
-    h4 = e.el('h4');
     h4.textContent = 'Features';
     let ul = e.el('ul');
     let li = ul.el('li');
