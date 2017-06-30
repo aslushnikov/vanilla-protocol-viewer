@@ -11,12 +11,13 @@ async function main() {
   let domains = new Map();
   for (let domain of allDomains)
     domains.set(domain.domain, domain);
-  for (var domain of allDomains)
-    renderDomain(domain);
   let e = renderDomain(domains.get('Network'));
   document.body.appendChild(e);
 
-  window.addEventListener("popstate", () => {
+  doRoute();
+  window.addEventListener("popstate", doRoute);
+
+  function doRoute() {
     let route = (window.location.hash || '#').substring(1);
     if (!route)
       return;
@@ -24,7 +25,10 @@ async function main() {
     let e = renderDomain(domains.get(domain));
     document.body.innerHTML = '';
     document.body.appendChild(e);
-  });
+    var elem = document.getElementById(route);
+    if (elem)
+      elem.scrollIntoView();
+  }
 }
 
 function renderDomain(domain) {
@@ -48,7 +52,7 @@ function renderDomain(domain) {
     let container = main.box('box');
     for (let i = 0; i < domain.commands.length; ++i) {
       let method = domain.commands[i];
-      container.appendChild(renderMethod(domain, method));
+      container.appendChild(renderEventOrMethod(domain, method));
     }
   }
 
@@ -59,7 +63,7 @@ function renderDomain(domain) {
     let container = main.box('box');
     for (let i = 0; i < domain.events.length; ++i) {
       let event = domain.events[i];
-      container.appendChild(renderMethod(domain, event));
+      container.appendChild(renderEventOrMethod(domain, event));
     }
   }
 
@@ -114,12 +118,13 @@ function renderType(domain, type) {
   return main;
 }
 
-function renderMethod(domain, method) {
+function renderEventOrMethod(domain, method) {
   //let main = document.createDocumentFragment();//E.vbox('method');
   let main = E.div('method');
   {
     // Render heading.
     let heading = main.el('h4', 'monospace');
+    heading.setAttribute('id', `${domain.domain}.${method.name}`);
     heading.addText(domain.domain + '.', 'method-domain');
     heading.addText(method.name, 'method-name');
   }
