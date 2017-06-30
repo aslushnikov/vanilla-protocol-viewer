@@ -318,6 +318,9 @@ function renderLanding(loadingTime, protocols) {
     h4.textContent = 'Features';
     let ul = e.el('ul');
     let li = ul.el('li');
+    li.code('Blazingly fast ');
+    li.addText('There are no roundtrips to the server to perform search or to render a page.');
+    li = ul.el('li');
     li.code('Instant Search ');
     li.addText('Start typing anywhere to initiate searching.');
     li = ul.el('li');
