@@ -187,7 +187,7 @@ function renderItem(item) {
       p1.text(item.searchResult[2].text);
     //p1.textContent = item.entry;
     let p2 = container.el('div',  'search-item-description');
-    p2.textContent = item.description;
+    p2.innerHTML = item.description;
   }
   {
     // Render domain
