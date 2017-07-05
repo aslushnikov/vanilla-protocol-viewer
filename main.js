@@ -8,71 +8,80 @@ let PROTOCOLS = {
  * */
 }
 
-document.addEventListener('DOMContentLoaded', main);
-
-async function main() {
+document.addEventListener('DOMContentLoaded', () => {
   let sidebar = document.getElementById('sidebar');
   let content = document.getElementById('content');
 
-  let startLoading = Date.now();
-  let protocols = await Promise.all(Object.values(PROTOCOLS).map(url => fetch(url).then(r => r.json())));
-  let endLoading = Date.now();
-  let loadingTime = endLoading - startLoading;
+  window.app = new App(sidebar, content);
+});
 
-  let allDomains = [];
-  for (let protocol of protocols)
-    allDomains.push(...protocol.domains);
-  var search = new Search(allDomains, document.getElementById('search'), document.getElementById('sresults'));
-  let domains = new Map();
-  for (let domain of allDomains)
-    domains.set(domain.domain, domain);
-  renderSidebar(Array.from(domains.keys()));
-
-  doRoute();
-  let elem = document.getElementById(window.location.hash.substring(1));
-  if (elem)
-    elem.scrollIntoView();
-  window.addEventListener("popstate", doRoute);
-
-  window.revealHash = function(hash) {
-    if (window.location.hash === hash)
-      doRoute();
-    else
-      window.location.hash = hash;
+class App {
+  constructor(sidebarElement, contentElement) {
+    this._sidebarElement = sidebarElement;
+    this._contentElement = contentElement;
+    this._domains = new Map();
+    this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
+    this._initialize();
   }
 
-  function doRoute() {
+  async _initialize() {
+    let protocols = await Promise.all(Object.values(PROTOCOLS).map(url => fetch(url).then(r => r.json())));
+
+    this._domains.clear();
+    for (let protocol of protocols) {
+      for (let domain of protocol.domains)
+        this._domains.set(domain.domain, domain);
+    }
+    this._search.setDomains(Array.from(this._domains.values()));
+    renderSidebar(Array.from(this._domains.keys()));
+
+    this.doRoute();
+    let elem = document.getElementById(window.location.hash.substring(1));
+    if (elem)
+      elem.scrollIntoView();
+    window.addEventListener("popstate", () => this.doRoute());
+
+    window.revealHash = (hash) => {
+      if (window.location.hash === hash)
+        this.doRoute();
+      else
+        window.location.hash = hash;
+    }
+
+  }
+
+  doRoute() {
     let route = (window.location.hash || '#').substring(1);
     if (!route) {
-      content.innerHTML = '';
-      let e = renderLanding(loadingTime, protocols);
-      content.appendChild(e);
+      this._contentElement.innerHTML = '';
+      let e = renderLanding();
+      this._contentElement.appendChild(e);
       return;
     }
     let [domain, method] = route.split('.');
-    if (!domains.has(domain)) {
-      content.innerHTML = '';
+    if (!this._domains.has(domain)) {
+      this._contentElement.innerHTML = '';
       let e = renderError('Unknown location: ' + route);
-      content.appendChild(e);
+      this._contentElement.appendChild(e);
       return;
     }
-    search.cancelSearch();
-    var active = sidebar.querySelector('.active-link');
+    this._search.cancelSearch();
+    var active = this._sidebarElement.querySelector('.active-link');
     if (active)
       active.classList.remove('active-link');
-    let link = sidebar.querySelector(`[href='#${domain}']`);
+    let link = this._sidebarElement.querySelector(`[href='#${domain}']`);
     if (link)
       link.classList.add('active-link');
 
-    content.innerHTML = '';
-    let e = Renderer.renderDomain(domains.get(domain));
-    content.appendChild(e);
+    this._contentElement.innerHTML = '';
+    let e = Renderer.renderDomain(this._domains.get(domain));
+    this._contentElement.appendChild(e);
     let elem = document.getElementById(route);
     if (elem)
       elem.scrollIntoView();
     else if (!method)
-      content.scrollTop = 0;
-    content.focus();
+      this._contentElement.scrollTop = 0;
+    this._contentElement.focus();
     document.title = route;
   }
 }
@@ -94,7 +103,7 @@ function renderError(error) {
   return main;
 }
 
-function renderLanding(loadingTime, protocols) {
+function renderLanding() {
   let main = E.div();
   {
     let e = main.box();
@@ -103,18 +112,14 @@ function renderLanding(loadingTime, protocols) {
     let div = e.div();
     div.text('Protocols fetched from ');
     div.a('ChromeDevTools/devtools-protocol', 'https://github.com/ChromeDevTools/devtools-protocol');
-    div.text(' in ' + (((loadingTime * 1000)|0) / 1000) + 'ms:');
     let ul = div.el('ul');
     var protocolNames = Object.keys(PROTOCOLS);
-    protocols = protocols.slice();
     for (let protocolName in PROTOCOLS) {
       let li = ul.el('li');
       let a = li.el('a');
       a.href = PROTOCOLS[protocolName];
       a.textContent = protocolName;
       a.target = '_blank';
-      let protocol = protocols.shift();
-      li.text(` v${protocol.version.major}.${protocol.version.minor}`);
     }
   }
   {

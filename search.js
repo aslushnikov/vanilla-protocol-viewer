@@ -1,5 +1,5 @@
 class Search {
-  constructor(allDomains, searchHeader, resultsElement) {
+  constructor(searchHeader, resultsElement) {
     this._searchInput = searchHeader.querySelector('input');
     this._items = [];
     this._selectedElement = null;
@@ -7,7 +7,30 @@ class Search {
     this._searchInput.addEventListener('keydown', this._onKeyDown.bind(this), false);
     this._results = resultsElement;
 
-    for (var domain of allDomains) {
+    // Activate search on any keypress
+    document.addEventListener('keypress', event => {
+      if (/[a-zA-Z]/.test(event.key))
+        this._searchInput.focus();
+    });
+    // Activate search on any keypress
+    document.addEventListener('click', event => {
+      var node = event.target;
+      while (node) {
+        if (node === this._searchInput)
+          return;
+        if (node.classList.contains('search-item')) {
+          window.revealHash(node.__url);
+          return;
+        }
+        node = node.parentElement;
+      }
+      this.cancelSearch();
+    });
+  }
+
+  setDomains(domains) {
+    this._items = [];
+    for (var domain of domains) {
       for (var command of (domain.commands || [])) {
         this._items.push({
           domain: domain.domain,
@@ -36,26 +59,6 @@ class Search {
         });
       }
     }
-
-    // Activate search on any keypress
-    document.addEventListener('keypress', event => {
-      if (/[a-zA-Z]/.test(event.key))
-        this._searchInput.focus();
-    });
-    // Activate search on any keypress
-    document.addEventListener('click', event => {
-      var node = event.target;
-      while (node) {
-        if (node === this._searchInput)
-          return;
-        if (node.classList.contains('search-item')) {
-          window.revealHash(node.__url);
-          return;
-        }
-        node = node.parentElement;
-      }
-      this.cancelSearch();
-    });
   }
 
   cancelSearch() {
