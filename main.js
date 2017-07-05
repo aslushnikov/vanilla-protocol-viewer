@@ -251,7 +251,7 @@ var primitiveTypes = new Set([
 
 function renderTypeLink(domain, parameter) {
   if (primitiveTypes.has(parameter.type))
-    return E.text(parameter.type, 'parameter-type');
+    return E.el('span', 'parameter-type', parameter.type);
   if (parameter.$ref) {
     let a = E.el('a', 'parameter-type');
     if (parameter.$ref.includes('.'))
@@ -268,11 +268,11 @@ function renderTypeLink(domain, parameter) {
     generic.addText(' ]');
     return generic;
   }
-  return E.text('<TYPE>', 'parameter-type');
+  return E.el('span', 'parameter-type', '<TYPE>');
 }
 
 function experimentalMark() {
-  var e = E.text('experimental', 'experimental');
+  let e = E.el('span', 'experimental', 'experimental');
   e.title = 'This may be changed, moved or removed';
   return e;
 }
@@ -337,108 +337,75 @@ function renderLanding(loadingTime, protocols) {
 
 // HELPERS
 
-class E {
-  static el(name, className) {
+const E = {
+  el: function(name, className, textContent) {
     let e = document.createElement(name);
     if (className)
       e.className = className;
+    if (textContent)
+      e.textContent = textContent;
     return e;
-  }
+  },
 
-  static box(className) {
+  text: function(text, className, tagName = 'span') {
+    let e = E.el(tagName, className);
+    e.textContent = text;
+    return e;
+  },
+
+  div: function(className) {
+    return E.el('div', className);
+  },
+
+  span: function(className) {
+    return E.el('span', className);
+  },
+
+  box: function(className) {
     let e = E.el('div', className);
     e.classList.add('box');
     return e;
-  }
+  },
 
-  static div(className) {
-    return E.el('div', className);
-  }
-
-  static span(className) {
-    return E.el('span', className);
-  }
-
-  static hbox(className) {
+  hbox: function(className) {
     let e = E.el('div', className);
     e.classList.add('hbox');
     return e;
-  }
+  },
 
-  static vbox(className) {
+  vbox: function(className) {
     let e = E.el('div', className);
     e.classList.add('vbox');
     return e;
-  }
+  },
 
-  static text(text, className) {
-    let e = E.el('span', className);
-    e.textContent = text;
-    return e;
-  }
+  strong: function(text) {
+    return E.el('strong', '', text);
+  },
+
+  code: function(text) {
+    return E.el('code', '', text);
+  },
+
+  a: function(text, href) {
+    let link = E.el('a', '', text);
+    link.href = href;
+    return link;
+  },
 };
 
-Node.prototype.div = function(className) {
-  let div = E.div(className);
-  this.appendChild(div);
-  return div;
-}
-
-Node.prototype.span = function(className) {
-  let span = E.span(className);
-  this.appendChild(span);
-  return span;
-}
-
-
-Node.prototype.box = function(className) {
-  let box = E.box(className);
-  this.appendChild(box);
-  return box;
-}
-
-Node.prototype.hbox = function(className) {
-  let box = E.hbox(className);
-  this.appendChild(box);
-  return box;
-}
-
-Node.prototype.vbox = function(className) {
-  let box = E.vbox(className);
-  this.appendChild(box);
-  return box;
+// Install helpers on Node.prototype
+for (let helper in E) {
+  Node.prototype[helper] = function(...args) {
+    let element = E[helper].apply(null, args);
+    this.appendChild(element);
+    return element;
+  };
 }
 
 Node.prototype.addText = function(text, className) {
-  let t = E.text(text, className);
+  let t = E.el('span', className, text);
   this.appendChild(t);
   return t;
 }
 
-Node.prototype.strong = function(text) {
-  let t = E.el('strong');
-  this.appendChild(t);
-  t.textContent = text;
-  return t;
-}
-
-Node.prototype.code = function(text) {
-  let t = E.el('code');
-  this.appendChild(t);
-  t.textContent = text;
-  return t;
-}
-
-Node.prototype.a = function(text, href) {
-  let t = E.el('a');
-  this.appendChild(t);
-  t.textContent = text;
-  t.href = href;
-  return t;
-}
-
-Node.prototype.el = function(name, className) {
-  let el = E.el(name, className);
-  this.appendChild(el);
-  return el;
-}
