@@ -179,11 +179,9 @@ function renderTitle(domainName, domainEntry) {
     let heading = E.el('h4', 'monospace');
     let id = `${domainName}.${domainEntry}`;
     heading.setAttribute('id', id);
-    heading.addText(domainName + '.', 'method-domain');
-    heading.addText(domainEntry, 'method-name');
-    let ref = heading.el('a', 'title-link');
-    ref.href = '#' + id;
-    ref.textContent = '#';
+    heading.text(domainName + '.', 'method-domain');
+    heading.text(domainEntry, 'method-name');
+    heading.a('#', '#' + id).classList.add('title-link');
     return heading;
 }
 
@@ -260,9 +258,9 @@ function renderTypeLink(domain, parameter) {
   }
   if (parameter.type === 'array') {
     let generic = E.span('parameter-type');
-    generic.addText('array [ ');
+    generic.text('array [ ');
     generic.appendChild(renderTypeLink(domain, parameter.items));
-    generic.addText(' ]');
+    generic.text(' ]');
     return generic;
   }
   return E.el('span', 'parameter-type', '<TYPE>');
@@ -275,14 +273,9 @@ function experimentalMark() {
 }
 
 function renderError(error) {
-  let main = E.div();
-  {
-    let e = main.box();
-    let h2 = e.el('h2');
-    h2.addText('Error');
-    let p = e.el('p');
-    p.addText(error);
-  }
+  let main = E.box();
+  main.el('h2', '', 'Error');
+  main.p('', error);
   return main;
 }
 
@@ -293,9 +286,9 @@ function renderLanding(loadingTime, protocols) {
     let h2 = e.el('h2');
     h2.textContent = 'Vanilla Protocol Viewer';
     let div = e.div();
-    div.addText('Protocols fetched from ');
+    div.text('Protocols fetched from ');
     div.a('ChromeDevTools/devtools-protocol', 'https://github.com/ChromeDevTools/devtools-protocol');
-    div.addText(' in ' + (((loadingTime * 1000)|0) / 1000) + 'ms:');
+    div.text(' in ' + (((loadingTime * 1000)|0) / 1000) + 'ms:');
     let ul = div.el('ul');
     var protocolNames = Object.keys(PROTOCOLS);
     protocols = protocols.slice();
@@ -306,7 +299,7 @@ function renderLanding(loadingTime, protocols) {
       a.textContent = protocolName;
       a.target = '_blank';
       let protocol = protocols.shift();
-      li.addText(` v${protocol.version.major}.${protocol.version.minor}`);
+      li.text(` v${protocol.version.major}.${protocol.version.minor}`);
     }
   }
   {
@@ -316,18 +309,18 @@ function renderLanding(loadingTime, protocols) {
     let ul = e.el('ul');
     let li = ul.el('li');
     li.code('Blazingly fast ');
-    li.addText('There are no roundtrips to the server to perform search or to render a page.');
+    li.text('There are no roundtrips to the server to perform search or to render a page.');
     li = ul.el('li');
     li.code('Instant Search ');
-    li.addText('Start typing anywhere to initiate searching.');
+    li.text('Start typing anywhere to initiate searching.');
     li = ul.el('li');
     li.code('Zero-Dependency ')
-    li.addText('This is a small self-contained project in less then 1000LOC.');
+    li.text('This is a small self-contained project in less then 1000LOC.');
     li = ul.el('li');
     li.code('No Buildsteps ');
-    li.addText('Written in vanilla JavaScript / HTML / CSS.');
-    e.addText('Inspired by ');
-    e.a( 'Chrome DevTools Protocol Viewer', 'https://chromedevtools.github.io/devtools-protocol/');
+    li.text('Written in vanilla JavaScript / HTML / CSS.');
+    e.text('Inspired by ');
+    e.a('Chrome DevTools Protocol Viewer', 'https://chromedevtools.github.io/devtools-protocol/');
   }
   return main;
 }
@@ -403,10 +396,3 @@ for (let helper in E) {
     return element;
   };
 }
-
-Node.prototype.addText = function(text, className) {
-  let t = E.el('span', className, text);
-  this.appendChild(t);
-  return t;
-}
-

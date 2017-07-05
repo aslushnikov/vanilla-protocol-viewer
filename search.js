@@ -180,11 +180,11 @@ function renderItem(item) {
     let container = main.div('search-item-main');
     let p1 = container.el('div',  'search-item-title monospace');
     if (item.searchResult[0].text.length)
-      p1.addText(item.searchResult[0].text);
+      p1.text(item.searchResult[0].text);
     if (item.searchResult[1].text.length)
-      p1.addText(item.searchResult[1].text, 'search-highlight');
+      p1.text(item.searchResult[1].text, 'search-highlight');
     if (item.searchResult[2].text.length)
-      p1.addText(item.searchResult[2].text);
+      p1.text(item.searchResult[2].text);
     //p1.textContent = item.entry;
     let p2 = container.el('div',  'search-item-description');
     p2.textContent = item.description;
@@ -193,7 +193,7 @@ function renderItem(item) {
     // Render domain
     // Render Name and Description
     let container = main.vbox('search-item-domain');
-    container.addText(item.domain, 'parameter-name monospace opttonal');
+    container.text(item.domain, 'parameter-name monospace opttonal');
   }
   main.__url = item.url;
   return main;
