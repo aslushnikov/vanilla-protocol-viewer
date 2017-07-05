@@ -164,15 +164,12 @@ function renderType(domain, type) {
       container.appendChild(renderParameter(domain, parameter));
   }
   if (type.type) {
-    let container = main.el('p');
-    container.addText('Type: ');
-    container.addText(type.type, 'parameter-type');
+    main.el('p', '', 'Type: ')
+      .text(type.type, 'parameter-type');
   }
   if (type.enum) {
-    let title = main.el('h5');
-    title.textContent = 'Allowed values';
-    let p = main.el('p');
-    p.textContent = type.enum.join(', ');
+    main.el('h5', '', 'Allowed values');
+    main.el('p', '', type.enum.join(', '));
   }
   return main;
 }
@@ -353,28 +350,32 @@ const E = {
     return e;
   },
 
-  div: function(className) {
-    return E.el('div', className);
+  div: function(...args) {
+    return E.el('div', ...args);
   },
 
-  span: function(className) {
-    return E.el('span', className);
+  span: function(...args) {
+    return E.el('span', ...args);
   },
 
-  box: function(className) {
-    let e = E.el('div', className);
+  p: function(...args) {
+    return E.el('p', ...args);
+  },
+
+  box: function(...args) {
+    let e = E.el('div', ...args);
     e.classList.add('box');
     return e;
   },
 
-  hbox: function(className) {
-    let e = E.el('div', className);
+  hbox: function(...args) {
+    let e = E.div(...args);
     e.classList.add('hbox');
     return e;
   },
 
-  vbox: function(className) {
-    let e = E.el('div', className);
+  vbox: function(...args) {
+    let e = E.div(...args);
     e.classList.add('vbox');
     return e;
   },
