@@ -15,12 +15,41 @@ document.addEventListener('DOMContentLoaded', () => {
   window.app = new App(sidebar, content);
 });
 
+class Router {
+  constructor(defaultHandler) {
+    this._routes = new Map();
+    this._defaultHandler = defaultHandler;
+  }
+
+  setRoute(regex, handler) {
+    this._routes.set(regex, handler)
+  }
+
+  handle(route) {
+    for (let regex of this._routes.keys()) {
+      var matches = route.match(regex);
+      if (matches) {
+        this._routes.get(regex).call(null, route, ...matches.slice(1));
+        return;
+      }
+    }
+    this._defaultHandler.call(null, route);
+  }
+
+  static anchorForDomain(domainName, subtitle) {
+    return domainName + '_' + subtitle;
+  }
+}
+
 class App {
   constructor(sidebarElement, contentElement) {
     this._sidebarElement = sidebarElement;
     this._contentElement = contentElement;
     this._domains = new Map();
     this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
+    this._router = new Router(route => this._renderError);
+    this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, this._onNavigateDomain.bind(this));
+    this._router.setRoute(/^$/, this._onNavigateHome.bind(this));
     this._initialize();
   }
 
@@ -36,9 +65,6 @@ class App {
     renderSidebar(Array.from(this._domains.keys()));
 
     this.doRoute();
-    let elem = document.getElementById(window.location.hash.substring(1));
-    if (elem)
-      elem.scrollIntoView();
     window.addEventListener("popstate", () => this.doRoute());
 
     window.revealHash = (hash) => {
@@ -47,42 +73,42 @@ class App {
       else
         window.location.hash = hash;
     }
-
   }
 
-  doRoute() {
-    let route = (window.location.hash || '#').substring(1);
-    if (!route) {
-      this._contentElement.innerHTML = '';
-      let e = renderLanding();
-      this._contentElement.appendChild(e);
-      return;
-    }
-    let [domain, method] = route.split('.');
-    if (!this._domains.has(domain)) {
-      this._contentElement.innerHTML = '';
-      let e = renderError('Unknown location: ' + route);
-      this._contentElement.appendChild(e);
-      return;
-    }
-    this._search.cancelSearch();
+  _onNavigateDomain(route, domain, method) {
+    document.title = route;
+    this._contentElement.innerHTML = '';
     var active = this._sidebarElement.querySelector('.active-link');
     if (active)
       active.classList.remove('active-link');
+    if (!this._domains.has(domain)) {
+      this._contentElement.appendChild(renderError('Unknown domain: ' + domain));
+      return;
+    }
     let link = this._sidebarElement.querySelector(`[href='#${domain}']`);
     if (link)
       link.classList.add('active-link');
-
-    this._contentElement.innerHTML = '';
-    let e = Renderer.renderDomain(this._domains.get(domain));
-    this._contentElement.appendChild(e);
-    let elem = document.getElementById(route);
+    this._search.cancelSearch();
+    let render = Renderer.renderDomain(this._domains.get(domain));
+    this._contentElement.appendChild(render);
+    let elem = render.querySelector('#' + Router.anchorForDomain(domain, method));
     if (elem)
       elem.scrollIntoView();
     else if (!method)
       this._contentElement.scrollTop = 0;
     this._contentElement.focus();
-    document.title = route;
+  }
+
+  _onNavigateHome() {
+    document.title = 'Vanilla Protocol Viewer';
+    this._contentElement.innerHTML = '';
+    let e = renderLanding();
+    this._contentElement.appendChild(e);
+  }
+
+  doRoute() {
+    let route = (window.location.hash || '#').substring(1);
+    this._router.handle(route);
   }
 }
 

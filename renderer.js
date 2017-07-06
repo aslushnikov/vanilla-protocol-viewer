@@ -90,7 +90,7 @@ const Renderer = {
     // Render heading.
     let heading = E.el('h4', 'monospace');
     let id = `${domainName}.${title}`;
-    heading.setAttribute('id', id);
+    heading.setAttribute('id', Router.anchorForDomain(domainName, title));
     heading.text(domainName + '.', 'method-domain');
     heading.text(title, 'method-name');
     heading.a('#', '#' + id).classList.add('title-link');
