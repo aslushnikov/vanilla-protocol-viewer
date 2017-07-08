@@ -1,4 +1,8 @@
 class Search {
+  /**
+   * @param {!Element} searchHeader
+   * @param {!Element} resultsElement
+   */
   constructor(searchHeader, resultsElement) {
     this._searchInput = searchHeader.querySelector('input');
     this._items = [];
@@ -200,11 +204,5 @@ function renderItem(item) {
   }
   main.__url = item.url;
   return main;
-}
-
-Event.prototype.consume = function()
-{
-    this.preventDefault();
-    this.stopPropagation();
 }
 

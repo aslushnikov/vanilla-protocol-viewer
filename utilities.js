@@ -68,3 +68,7 @@ for (let helper in E) {
   };
 }
 
+Event.prototype.consume = function() {
+    this.preventDefault();
+    this.stopPropagation();
+}
