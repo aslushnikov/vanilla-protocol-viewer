@@ -78,6 +78,7 @@ class App {
     /** @type {!Map<string, !Object>} */
     this._domains = new Map();
     this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
+    this._protocolRenderer = new ProtocolRenderer();
     this._router = new Router(route => this._renderError);
     this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, (route, domain, method) => this._onNavigateDomain(route, domain, method));
     this._router.setRoute(/^$/, this._onNavigateHome.bind(this));
@@ -123,7 +124,7 @@ class App {
     if (link)
       link.classList.add('active-link');
     this._search.cancelSearch();
-    let render = ProtocolRenderer.renderDomain(this._domains.get(domain));
+    let render = this._protocolRenderer.renderDomain(this._domains.get(domain));
     this._contentElement.appendChild(render);
     let elem = render.querySelector('#' + Router.anchorForDomain(domain, method));
     if (elem)

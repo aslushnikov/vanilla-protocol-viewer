@@ -1,5 +1,5 @@
-const ProtocolRenderer = {
-  renderDomain: function(domain) {
+class ProtocolRenderer {
+  renderDomain(domain) {
     let main = E.div('domain');
     {
       // Render domain main description.
@@ -11,7 +11,7 @@ const ProtocolRenderer = {
       let description = container.el('p');
       description.innerHTML = domain.description || '';
       if (domain.experimental)
-        description.appendChild(ProtocolRenderer.experimentalMark());
+        description.appendChild(this.experimentalMark());
     }
 
     if (domain.commands && domain.commands.length) {
@@ -23,7 +23,7 @@ const ProtocolRenderer = {
         if (i !== 0)
           container.div('boundary');
         let method = domain.commands[i];
-        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, method));
+        container.appendChild(this.renderEventOrMethod(domain, method));
       }
     }
 
@@ -36,7 +36,7 @@ const ProtocolRenderer = {
         if (i !== 0)
           container.div('boundary');
         let event = domain.events[i];
-        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, event));
+        container.appendChild(this.renderEventOrMethod(domain, event));
       }
     }
 
@@ -49,22 +49,22 @@ const ProtocolRenderer = {
         if (i !== 0)
           container.div('boundary');
         let type = domain.types[i];
-        container.appendChild(ProtocolRenderer.renderDomainType(domain, type));
+        container.appendChild(this.renderDomainType(domain, type));
       }
     }
 
     return main;
-  },
+  }
 
-  renderDomainType: function(domain, type) {
+  renderDomainType(domain, type) {
     let main = E.div('type');
-    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, type.id));
+    main.appendChild(this.renderTitle(domain.domain, type.id));
     {
       // Render description.
       let p = main.el('p');
       p.textContent = type.description || '';
       if (type.experimental)
-        p.appendChild(ProtocolRenderer.experimentalMark());
+        p.appendChild(this.experimentalMark());
     }
     if (type.properties && type.properties.length) {
       // Render parameters.
@@ -72,7 +72,7 @@ const ProtocolRenderer = {
       title.textContent = 'Properties';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of type.properties)
-        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
+        container.appendChild(this.renderParameter(domain, parameter));
     }
     if (type.type) {
       main.el('p', '', 'Type: ')
@@ -83,9 +83,9 @@ const ProtocolRenderer = {
       main.el('p', '', type.enum.join(', '));
     }
     return main;
-  },
+  }
 
-  renderTitle: function(domainName, title) {
+  renderTitle(domainName, title) {
     // Render heading.
     let heading = E.el('h4', 'monospace');
     let id = `${domainName}.${title}`;
@@ -94,17 +94,17 @@ const ProtocolRenderer = {
     heading.text(title, 'method-name');
     heading.a('#' + id, '#').classList.add('title-link');
     return heading;
-  },
+  }
 
-  renderEventOrMethod: function(domain, method) {
+  renderEventOrMethod(domain, method) {
     let main = E.div('method');
-    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, method.name));
+    main.appendChild(this.renderTitle(domain.domain, method.name));
     {
       // Render description.
       let p = main.el('p');
       p.innerHTML = method.description || '';
       if (method.experimental)
-        p.appendChild(ProtocolRenderer.experimentalMark());
+        p.appendChild(this.experimentalMark());
     }
     if (method.parameters && method.parameters.length) {
       // Render parameters.
@@ -112,7 +112,7 @@ const ProtocolRenderer = {
       title.textContent = 'Parameters';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of method.parameters)
-        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
+        container.appendChild(this.renderParameter(domain, parameter));
     }
     if (method.returns && method.returns.length) {
       // Render return values.
@@ -120,12 +120,12 @@ const ProtocolRenderer = {
       title.textContent = 'RETURN OBJECT';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of method.returns)
-        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
+        container.appendChild(this.renderParameter(domain, parameter));
     }
     return main;
-  },
+  }
 
-  renderParameter: function(domain, parameter) {
+  renderParameter(domain, parameter) {
     let main = E.hbox('parameter');
     {
       // Render parameter name.
@@ -137,16 +137,16 @@ const ProtocolRenderer = {
     {
       // Render parameter value.
       let container = main.vbox('parameter-value');
-      container.appendChild(ProtocolRenderer.renderTypeLink(domain, parameter));
+      container.appendChild(this.renderTypeLink(domain, parameter));
       let description = container.span('parameter-description');
       description.innerHTML = parameter.description || '';
       if (parameter.experimental)
-        description.appendChild(ProtocolRenderer.experimentalMark());
+        description.appendChild(this.experimentalMark());
     }
     return main;
-  },
+  }
 
-  renderTypeLink: function(domain, parameter) {
+  renderTypeLink(domain, parameter) {
     const primitiveTypes = new Set([
       "string",
       "integer",
@@ -170,17 +170,17 @@ const ProtocolRenderer = {
     if (parameter.type === 'array') {
       let generic = E.span('parameter-type');
       generic.text('array [ ');
-      generic.appendChild(ProtocolRenderer.renderTypeLink(domain, parameter.items));
+      generic.appendChild(this.renderTypeLink(domain, parameter.items));
       generic.text(' ]');
       return generic;
     }
     return E.el('span', 'parameter-type', '<TYPE>');
-  },
+  }
 
-  experimentalMark: function() {
+  experimentalMark() {
     let e = E.el('span', 'experimental', 'experimental');
     e.title = 'This may be changed, moved or removed';
     return e;
-  },
+  }
 };
 
