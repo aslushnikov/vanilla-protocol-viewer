@@ -166,7 +166,7 @@ function renderLanding() {
     h2.textContent = 'Vanilla Protocol Viewer';
     let div = e.div();
     div.text('Protocols fetched from ');
-    div.a('ChromeDevTools/devtools-protocol', 'https://github.com/ChromeDevTools/devtools-protocol');
+    div.a('https://github.com/ChromeDevTools/devtools-protocol', 'ChromeDevTools/devtools-protocol');
     let ul = div.el('ul');
     var protocolNames = Object.keys(PROTOCOLS);
     for (let protocolName in PROTOCOLS) {
@@ -195,7 +195,7 @@ function renderLanding() {
     li.code('No Buildsteps ');
     li.text('Written in vanilla JavaScript / HTML / CSS.');
     e.text('Inspired by ');
-    e.a('Chrome DevTools Protocol Viewer', 'https://chromedevtools.github.io/devtools-protocol/');
+    e.a('https://chromedevtools.github.io/devtools-protocol/', 'Chrome DevTools Protocol Viewer');
   }
   return main;
 }

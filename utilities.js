@@ -52,8 +52,8 @@ const E = {
     return E.el('code', '', text);
   },
 
-  a: function(text, href) {
-    let link = E.el('a', '', text);
+  a: function(href, text) {
+    let link = E.el('a', '', text || href);
     link.href = href;
     return link;
   },
