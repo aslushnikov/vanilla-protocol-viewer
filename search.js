@@ -5,6 +5,7 @@ class Search {
    */
   constructor(searchHeader, resultsElement) {
     this._searchInput = searchHeader.querySelector('input');
+    /** @type {!Array<!Search.Item>} */
     this._items = [];
     this._selectedElement = null;
     this._searchInput.addEventListener('input', this._onInput.bind(this), false);
@@ -23,7 +24,7 @@ class Search {
         if (node === this._searchInput)
           return;
         if (node.classList.contains('search-item')) {
-          app.navigate(node.__url);
+          app.navigate(node.__route);
           return;
         }
         node = node.parentElement;
@@ -36,31 +37,25 @@ class Search {
     this._items = [];
     for (var domain of domains) {
       for (var command of (domain.commands || [])) {
-        this._items.push({
-          domain: domain.domain,
-          entry: command.name,
-          type: 'method',
-          description: command.description,
-          url: `#${domain.domain}.${command.name}`
-        });
+        let item = new Search.Item(domain.domain /* domainName */,
+          command.name /* domainEntry */,
+          Search.ItemType.Method /* itemType */,
+          command.description /* description */);
+        this._items.push(item);
       }
       for (var event of (domain.events || [])) {
-        this._items.push({
-          domain: domain.domain,
-          entry: event.name,
-          type: 'event',
-          description: event.description,
-          url: `#${domain.domain}.${event.name}`
-        });
+        let item = new Search.Item(domain.domain /* domainName */,
+          event.name /* domainEntry */,
+          Search.ItemType.Event /* itemType */,
+          event.description /* description */);
+        this._items.push(item);
       }
       for (var type of (domain.types || [])) {
-        this._items.push({
-          domain: domain.domain,
-          entry: type.id,
-          type: 'type',
-          description: type.description,
-          url: `#${domain.domain}.${type.id}`
-        });
+        let item = new Search.Item(domain.domain /* domainName */,
+          type.id /* domainEntry */,
+          Search.ItemType.Type /* itemType */,
+          type.description /* description */);
+        this._items.push(item);
       }
     }
   }
@@ -76,14 +71,14 @@ class Search {
     this._selectedElement = null;
     let query = this._searchInput.value;
     for (let item of this._items)
-      item.searchResult = searchInText(item.entry, query);
+      item.searchResult = searchInText(item.domainEntry, query);
 
     let matched = this._items.filter(item => !!item.searchResult.length);
     matched.sort((a, b) => {
       let index1 = a.searchResult[0].text.length;
       let index2 = b.searchResult[0].text.length;
       if (index1 === index2)
-        return a.entry.length - b.entry.length;
+        return a.domainEntry.length - b.domainEntry.length;
       return index1 - index2;
     });
     this._results.innerHTML = '';
@@ -108,7 +103,7 @@ class Search {
       } else if (event.key === "Enter") {
           event.consume();
           this.cancelSearch();
-          app.navigate(this._selectedElement.__url);
+          app.navigate(this._selectedElement.__route);
       }
   }
 
@@ -168,15 +163,15 @@ function renderItem(item) {
   {
     // Render icon
     let icon = main.span('search-item-icon');
-    if (item.type === 'method') {
+    if (item.type === Search.ItemType.Method) {
       icon.textContent = 'M';
       icon.title = 'Method';
       icon.classList.add('icon-method');
-    } else if (item.type === 'type') {
+    } else if (item.type === Search.ItemType.Type) {
       icon.textContent = 'T';
       icon.title = 'Type';
       icon.classList.add('icon-type');
-    } else if (item.type === 'event') {
+    } else if (item.type === Search.ItemType.Event) {
       icon.textContent = 'E';
       icon.title = 'Event';
       icon.classList.add('icon-event');
@@ -185,14 +180,13 @@ function renderItem(item) {
   {
     // Render Name and Description
     let container = main.div('search-item-main');
-    let p1 = container.el('div',  'search-item-title monospace');
+    let p1 = container.el('div', 'search-item-title monospace');
     if (item.searchResult[0].text.length)
       p1.text(item.searchResult[0].text);
     if (item.searchResult[1].text.length)
       p1.text(item.searchResult[1].text, 'search-highlight');
     if (item.searchResult[2].text.length)
       p1.text(item.searchResult[2].text);
-    //p1.textContent = item.entry;
     let p2 = container.el('div',  'search-item-description');
     p2.innerHTML = item.description;
   }
@@ -200,9 +194,33 @@ function renderItem(item) {
     // Render domain
     // Render Name and Description
     let container = main.vbox('search-item-domain');
-    container.text(item.domain, 'parameter-name monospace opttonal');
+    container.text(item.domainName, 'parameter-name monospace opttonal');
   }
-  main.__url = item.url;
+  main.__route = item.route;
   return main;
+}
+
+/** @enum */
+Search.ItemType = {
+  Method: Symbol('Method'),
+  Type: Symbol('Type'),
+  Event: Symbol('Event'),
+}
+
+Search.Item = class {
+  /**
+   * @param {string} domainName
+   * @param {string} domainEntry
+   * @param {!Search.ItemType} itemType
+   * @param {string} description
+   * @param {string} route
+   */
+  constructor(domainName, domainEntry, itemType, description) {
+    this.domainName = domainName;
+    this.domainEntry = domainEntry;
+    this.type = itemType;
+    this.description = description;
+    this.route = `#${domainName}.${domainEntry}`
+  }
 }
 
