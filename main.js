@@ -16,16 +16,42 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 class Router {
-  constructor(defaultHandler) {
+  /**
+   * @param {function(?)} unknownRouteHandler
+   */
+  constructor(unknownRouteHandler) {
     this._routes = new Map();
-    this._defaultHandler = defaultHandler;
+    this._unknownRouteHandler = unknownRouteHandler;
+    window.addEventListener("popstate", () => this._processRoute());
   }
 
+  /**
+   * @param {!RegExp} regex
+   * @param {function(?)} handler
+   */
   setRoute(regex, handler) {
     this._routes.set(regex, handler)
   }
 
-  handle(route) {
+  /**
+   * @param {string} route
+   */
+  navigate(route) {
+    if (window.location.hash === route)
+      this._processRoute();
+    else
+      window.location.hash = route;
+  }
+
+  /**
+   * @return {string}
+   */
+  route() {
+    return window.location.hash;
+  }
+
+  _processRoute() {
+    let route = (window.location.hash || '#').substring(1);
     for (let regex of this._routes.keys()) {
       var matches = route.match(regex);
       if (matches) {
@@ -33,7 +59,7 @@ class Router {
         return;
       }
     }
-    this._defaultHandler.call(null, route);
+    this._unknownRouteHandler.call(null, route);
   }
 
   static anchorForDomain(domainName, subtitle) {
@@ -42,15 +68,27 @@ class Router {
 }
 
 class App {
+  /**
+   * @param {!Element} sidebarElement
+   * @param {!Element} contentElement
+   */
   constructor(sidebarElement, contentElement) {
     this._sidebarElement = sidebarElement;
     this._contentElement = contentElement;
+    /** @type {!Map<string, !Object>} */
     this._domains = new Map();
     this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
     this._router = new Router(route => this._renderError);
-    this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, this._onNavigateDomain.bind(this));
+    this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, (route, domain, method) => this._onNavigateDomain(route, domain, method));
     this._router.setRoute(/^$/, this._onNavigateHome.bind(this));
     this._initialize();
+  }
+
+  /**
+   * @param {string} route
+   */
+  navigate(route) {
+    this._router.navigate(route);
   }
 
   async _initialize() {
@@ -64,15 +102,7 @@ class App {
     this._search.setDomains(Array.from(this._domains.values()));
     renderSidebar(Array.from(this._domains.keys()));
 
-    this.doRoute();
-    window.addEventListener("popstate", () => this.doRoute());
-
-    window.revealHash = (hash) => {
-      if (window.location.hash === hash)
-        this.doRoute();
-      else
-        window.location.hash = hash;
-    }
+    this._router.navigate(this._router.route());
   }
 
   _onNavigateDomain(route, domain, method) {
@@ -104,11 +134,6 @@ class App {
     this._contentElement.innerHTML = '';
     let e = renderLanding();
     this._contentElement.appendChild(e);
-  }
-
-  doRoute() {
-    let route = (window.location.hash || '#').substring(1);
-    this._router.handle(route);
   }
 }
 

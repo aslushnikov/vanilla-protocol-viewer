@@ -104,7 +104,7 @@ class Search {
       } else if (event.key === "Enter") {
           event.consume();
           this.cancelSearch();
-          window.revealHash(this._selectedElement.__url);
+          app.navigate(this._selectedElement.__url);
       }
   }
 
