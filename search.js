@@ -24,12 +24,14 @@ class Search {
         if (node === this._searchInput)
           return;
         if (node.classList.contains('search-item')) {
+          event.consume();
+          this._cancelSearch();
           app.navigate(node.__route);
           return;
         }
         node = node.parentElement;
       }
-      this.cancelSearch();
+      this._cancelSearch();
     });
   }
 
@@ -60,7 +62,7 @@ class Search {
     }
   }
 
-  cancelSearch() {
+  _cancelSearch() {
     this._searchInput.blur();
     this._results.style.setProperty('display', 'none');
     this._searchInput.value = '';
@@ -95,14 +97,14 @@ class Search {
   {
       if (event.key === "Escape" || event.keyCode === 27) {
           event.consume();
-          this.cancelSearch();
+          this._cancelSearch();
       } else if (event.key === "ArrowDown") {
           this._selectNext(event);
       } else if (event.key === "ArrowUp") {
           this._selectPrevious(event);
       } else if (event.key === "Enter") {
           event.consume();
-          this.cancelSearch();
+          this._cancelSearch();
           app.navigate(this._selectedElement.__route);
       }
   }

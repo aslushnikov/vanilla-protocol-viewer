@@ -119,7 +119,6 @@ class App {
     let link = this._sidebarElement.querySelector(`[href='#${domain}']`);
     if (link)
       link.classList.add('active-link');
-    this._search.cancelSearch();
     let render = this._protocolRenderer.renderDomain(this._domains.get(domain));
     this._contentElement.appendChild(render);
     let elem = render.querySelector('#' + ProtocolRenderer.titleId(domain, method));
