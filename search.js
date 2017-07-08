@@ -72,41 +72,36 @@ class Search {
   _onInput() {
     this._selectedElement = null;
     let query = this._searchInput.value;
-    for (let item of this._items)
-      item.searchResult = searchInText(item.domainEntry, query);
-
-    let matched = this._items.filter(item => !!item.searchResult.length);
-    matched.sort((a, b) => {
-      let index1 = a.searchResult[0].text.length;
-      let index2 = b.searchResult[0].text.length;
-      if (index1 === index2)
-        return a.domainEntry.length - b.domainEntry.length;
-      return index1 - index2;
-    });
-    this._results.innerHTML = '';
-    for (let i = 0; i < Math.min(matched.length, 50); ++i) {
-      this._results.appendChild(renderItem(matched[i]));
+    let results = [];
+    for (let item of this._items) {
+      let result = Search.SearchResult.create(item, query);
+      if (result)
+        results.push(result);
     }
+    results.sort((a, b) => b.score - a.score);
+    this._results.innerHTML = '';
+    for (let i = 0; i < Math.min(results.length, 50); ++i)
+      this._results.appendChild(renderSearchResult(results[i]));
+
     this._selectedElement = this._results.firstChild;
     this._results.style.setProperty('display', 'block');
     if (this._selectedElement)
       this._selectedElement.classList.add('selected');
   }
 
-  _onKeyDown(event)
-  {
-      if (event.key === "Escape" || event.keyCode === 27) {
-          event.consume();
-          this._cancelSearch();
-      } else if (event.key === "ArrowDown") {
-          this._selectNext(event);
-      } else if (event.key === "ArrowUp") {
-          this._selectPrevious(event);
-      } else if (event.key === "Enter") {
-          event.consume();
-          this._cancelSearch();
-          app.navigate(this._selectedElement.__route);
-      }
+  _onKeyDown(event) {
+    if (event.key === "Escape" || event.keyCode === 27) {
+      event.consume();
+      this._cancelSearch();
+    } else if (event.key === "ArrowDown") {
+      this._selectNext(event);
+    } else if (event.key === "ArrowUp") {
+      this._selectPrevious(event);
+    } else if (event.key === "Enter") {
+      event.consume();
+      this._cancelSearch();
+      app.navigate(this._selectedElement.__route);
+    }
   }
 
   _selectNext(event) {
@@ -135,32 +130,11 @@ class Search {
 }
 
 /**
- * @param {string} text
- * @param {string} query
- * @return {!Array<!{text: string, bold: boolean}>}
+ * @param {!Search.SearchResult} searchResult
+ * @return {!Element}
  */
-function searchInText(text, query)
-{
-    var index = text.toLowerCase().indexOf(query.toLowerCase());
-    if (index === -1)
-        return [];
-    var result = [];
-    result.push({
-        text: text.substring(0, index),
-        bold: false
-    });
-    result.push({
-        text: text.substring(index, index + query.length),
-        bold: true
-    });
-    result.push({
-        text: text.substring(index + query.length),
-        bold: false
-    });
-    return result;
-}
-
-function renderItem(item) {
+function renderSearchResult(searchResult) {
+  let item = searchResult.item;
   let main = E.hbox('search-item');
   {
     // Render icon
@@ -183,12 +157,7 @@ function renderItem(item) {
     // Render Name and Description
     let container = main.div('search-item-main');
     let p1 = container.el('div', 'search-item-title monospace');
-    if (item.searchResult[0].text.length)
-      p1.text(item.searchResult[0].text);
-    if (item.searchResult[1].text.length)
-      p1.text(item.searchResult[1].text, 'search-highlight');
-    if (item.searchResult[2].text.length)
-      p1.text(item.searchResult[2].text);
+    p1.appendChild(renderTextWithMatches(item.domainEntry, searchResult.domainEntryMatches));
     let p2 = container.el('div',  'search-item-description');
     p2.innerHTML = item.description;
   }
@@ -200,6 +169,40 @@ function renderItem(item) {
   }
   main.__route = item.route;
   return main;
+}
+
+/**
+ * @param {string} text
+ * @param {!Set<number>} matches
+ * @return {!DocumentFragment}
+ */
+function renderTextWithMatches(text, matches) {
+  let result = document.createDocumentFragment();
+  let insideMatch = false;
+  let currentIndex = 0;
+  for (let i = 0; i < text.length; ++i) {
+    if (insideMatch !== matches.has(i)) {
+      add(currentIndex, i, insideMatch);
+      insideMatch = matches.has(i);
+      currentIndex = i;
+    }
+  }
+  add(currentIndex, text.length, insideMatch);
+  return result;
+
+  /**
+   * @param {number} from
+   * @param {number} to
+   * @param {boolean} isHighlight
+   */
+  function add(from, to, isHighlight) {
+    if (to === from)
+      return;
+    if (isHighlight)
+      result.span('search-highlight', text.substring(from, to));
+    else
+      result.textNode(text.substring(from, to));
+  }
 }
 
 /** @enum */
@@ -221,8 +224,39 @@ Search.Item = class {
     this.domainName = domainName;
     this.domainEntry = domainEntry;
     this.type = itemType;
-    this.description = description;
+    this.description = description || '';
     this.route = `#${domainName}.${domainEntry}`
   }
 }
 
+Search.SearchResult = class {
+  /**
+   * @param {!Search.Item} item
+   * @param {number} score
+   * @param {!Set<number>} domainEntryMatches
+   */
+  constructor(item, score, domainEntryMatches) {
+    this.item = item;
+    this.score = score;
+    this.domainEntryMatches = domainEntryMatches;
+  }
+
+  /**
+   * @param {!Search.Item} item
+   * @param {string} query
+   * @param {?Search.SearchResult}
+   */
+  static create(item, query) {
+    let index = item.domainEntry.toLowerCase().indexOf(query.toLowerCase());
+    if (index === -1)
+      return null;
+    let matches = new Set();
+    // The shorter item length, the better.
+    let score = -item.domainEntry.length;
+    for (let i = index; i < index + query.length; ++i)
+      matches.add(i);
+    // Promote items which have matches.
+    score += 1000;
+    return new Search.SearchResult(item, score, matches);
+  }
+}

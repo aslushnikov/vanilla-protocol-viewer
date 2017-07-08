@@ -8,6 +8,10 @@ const E = {
     return e;
   },
 
+  textNode: function(text) {
+    return document.createTextNode(text);
+  },
+
   text: function(text, className, tagName = 'span') {
     let e = E.el(tagName, className);
     e.textContent = text;
