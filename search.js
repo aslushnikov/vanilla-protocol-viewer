@@ -19,7 +19,7 @@ class Search {
         if (node === this._searchInput)
           return;
         if (node.classList.contains('search-item')) {
-          window.revealHash(node.__url);
+          app.navigate(node.__url);
           return;
         }
         node = node.parentElement;
@@ -65,7 +65,7 @@ class Search {
     this._searchInput.blur();
     this._results.style.setProperty('display', 'none');
     this._searchInput.value = '';
-    document.getElementById('content').focus();
+    app.focusContent();
   }
 
   _onInput() {

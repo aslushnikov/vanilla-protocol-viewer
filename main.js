@@ -84,6 +84,10 @@ class App {
     this._initialize();
   }
 
+  focusContent() {
+    this._contentElement.focus();
+  }
+
   /**
    * @param {string} route
    */
