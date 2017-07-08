@@ -61,10 +61,6 @@ class Router {
     }
     this._unknownRouteHandler.call(null, route);
   }
-
-  static anchorForDomain(domainName, subtitle) {
-    return domainName + '_' + subtitle;
-  }
 }
 
 class App {
@@ -126,7 +122,7 @@ class App {
     this._search.cancelSearch();
     let render = this._protocolRenderer.renderDomain(this._domains.get(domain));
     this._contentElement.appendChild(render);
-    let elem = render.querySelector('#' + Router.anchorForDomain(domain, method));
+    let elem = render.querySelector('#' + ProtocolRenderer.titleId(domain, method));
     if (elem)
       elem.scrollIntoView();
     else if (!method)

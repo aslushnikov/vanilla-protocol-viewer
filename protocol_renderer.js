@@ -1,4 +1,8 @@
 class ProtocolRenderer {
+  static titleId(domainName, domainEntry) {
+    return domainName + '_' + domainEntry;
+  }
+
   renderDomain(domain) {
     let main = E.div('domain');
     {
@@ -89,7 +93,7 @@ class ProtocolRenderer {
     // Render heading.
     let heading = E.el('h4', 'monospace');
     let id = `${domainName}.${title}`;
-    heading.setAttribute('id', Router.anchorForDomain(domainName, title));
+    heading.setAttribute('id', ProtocolRenderer.titleId(domainName, title));
     heading.text(domainName + '.', 'method-domain');
     heading.text(title, 'method-name');
     heading.a('#' + id, '#').classList.add('title-link');
