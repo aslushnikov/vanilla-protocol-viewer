@@ -1,7 +1,6 @@
-const Renderer = {
+const ProtocolRenderer = {
   renderDomain: function(domain) {
     let main = E.div('domain');
-
     {
       // Render domain main description.
       let container = main.div('box');
@@ -12,7 +11,7 @@ const Renderer = {
       let description = container.el('p');
       description.innerHTML = domain.description || '';
       if (domain.experimental)
-        description.appendChild(Renderer.experimentalMark());
+        description.appendChild(ProtocolRenderer.experimentalMark());
     }
 
     if (domain.commands && domain.commands.length) {
@@ -24,7 +23,7 @@ const Renderer = {
         if (i !== 0)
           container.div('boundary');
         let method = domain.commands[i];
-        container.appendChild(Renderer.renderEventOrMethod(domain, method));
+        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, method));
       }
     }
 
@@ -37,7 +36,7 @@ const Renderer = {
         if (i !== 0)
           container.div('boundary');
         let event = domain.events[i];
-        container.appendChild(Renderer.renderEventOrMethod(domain, event));
+        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, event));
       }
     }
 
@@ -50,7 +49,7 @@ const Renderer = {
         if (i !== 0)
           container.div('boundary');
         let type = domain.types[i];
-        container.appendChild(Renderer.renderDomainType(domain, type));
+        container.appendChild(ProtocolRenderer.renderDomainType(domain, type));
       }
     }
 
@@ -59,13 +58,13 @@ const Renderer = {
 
   renderDomainType: function(domain, type) {
     let main = E.div('type');
-    main.appendChild(Renderer.renderTitle(domain.domain, type.id));
+    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, type.id));
     {
       // Render description.
       let p = main.el('p');
       p.textContent = type.description || '';
       if (type.experimental)
-        p.appendChild(Renderer.experimentalMark());
+        p.appendChild(ProtocolRenderer.experimentalMark());
     }
     if (type.properties && type.properties.length) {
       // Render parameters.
@@ -73,7 +72,7 @@ const Renderer = {
       title.textContent = 'Properties';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of type.properties)
-        container.appendChild(Renderer.renderParameter(domain, parameter));
+        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
     if (type.type) {
       main.el('p', '', 'Type: ')
@@ -99,13 +98,13 @@ const Renderer = {
 
   renderEventOrMethod: function(domain, method) {
     let main = E.div('method');
-    main.appendChild(Renderer.renderTitle(domain.domain, method.name));
+    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, method.name));
     {
       // Render description.
       let p = main.el('p');
       p.innerHTML = method.description || '';
       if (method.experimental)
-        p.appendChild(Renderer.experimentalMark());
+        p.appendChild(ProtocolRenderer.experimentalMark());
     }
     if (method.parameters && method.parameters.length) {
       // Render parameters.
@@ -113,7 +112,7 @@ const Renderer = {
       title.textContent = 'Parameters';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of method.parameters)
-        container.appendChild(Renderer.renderParameter(domain, parameter));
+        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
     if (method.returns && method.returns.length) {
       // Render return values.
@@ -121,7 +120,7 @@ const Renderer = {
       title.textContent = 'RETURN OBJECT';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of method.returns)
-        container.appendChild(Renderer.renderParameter(domain, parameter));
+        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
     return main;
   },
@@ -138,11 +137,11 @@ const Renderer = {
     {
       // Render parameter value.
       let container = main.vbox('parameter-value');
-      container.appendChild(Renderer.renderTypeLink(domain, parameter));
+      container.appendChild(ProtocolRenderer.renderTypeLink(domain, parameter));
       let description = container.span('parameter-description');
       description.innerHTML = parameter.description || '';
       if (parameter.experimental)
-        description.appendChild(Renderer.experimentalMark());
+        description.appendChild(ProtocolRenderer.experimentalMark());
     }
     return main;
   },
@@ -171,7 +170,7 @@ const Renderer = {
     if (parameter.type === 'array') {
       let generic = E.span('parameter-type');
       generic.text('array [ ');
-      generic.appendChild(Renderer.renderTypeLink(domain, parameter.items));
+      generic.appendChild(ProtocolRenderer.renderTypeLink(domain, parameter.items));
       generic.text(' ]');
       return generic;
     }
@@ -184,5 +183,4 @@ const Renderer = {
     return e;
   },
 };
-
 

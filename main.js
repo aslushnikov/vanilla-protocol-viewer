@@ -123,7 +123,7 @@ class App {
     if (link)
       link.classList.add('active-link');
     this._search.cancelSearch();
-    let render = Renderer.renderDomain(this._domains.get(domain));
+    let render = ProtocolRenderer.renderDomain(this._domains.get(domain));
     this._contentElement.appendChild(render);
     let elem = render.querySelector('#' + Router.anchorForDomain(domain, method));
     if (elem)
