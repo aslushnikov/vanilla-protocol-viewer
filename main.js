@@ -66,6 +66,7 @@ class App {
 
   _onNavigateDomain(route, domain, method) {
     document.title = route;
+    this._search.setDefaultValue(route);
     this._search.cancelSearch();
     this._contentElement.innerHTML = '';
     var active = this._sidebarElement.querySelector('.active-link');
@@ -90,6 +91,7 @@ class App {
 
   _onNavigateHome() {
     document.title = 'Vanilla Protocol Viewer';
+    this._search.setDefaultValue('');
     this._search.cancelSearch();
     this._contentElement.innerHTML = '';
     var template = document.querySelector('#landing');

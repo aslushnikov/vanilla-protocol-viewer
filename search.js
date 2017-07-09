@@ -19,10 +19,20 @@ class Search {
 
     // Activate search on any keypress
     document.addEventListener('keypress', event => {
-      if (/\S/.test(event.key))
+      if (this._searchInput === document.activeElement)
+        return;
+      if (/\S/.test(event.key)) {
+        this._searchInput.value = '';
+        this._searchInput.focus();
+      }
+    });
+    // Activate search on backspace
+    document.addEventListener('keydown', event => {
+      if (this._searchInput === document.activeElement)
+        return;
+      if (event.keyCode === 8 || event.keyCode === 46)
         this._searchInput.focus();
     });
-    // Activate search on any keypress
     document.addEventListener('click', event => {
       if (this._searchInput.contains(event.target))
         return;
@@ -68,8 +78,12 @@ class Search {
   cancelSearch() {
     this._searchInput.blur();
     this._resultsElement.style.setProperty('display', 'none');
-    this._searchInput.value = '';
+    this._searchInput.value = this._defaultValue;
     app.focusContent();
+  }
+
+  setDefaultValue(value) {
+    this._defaultValue = value;
   }
 
   _onInput() {
