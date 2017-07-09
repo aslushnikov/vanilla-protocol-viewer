@@ -108,6 +108,8 @@ class Search {
       return;
     }
     this._resultsElement.innerHTML = '';
+    if (!query && dotIndex === -1)
+      this._addNavigateHomeItem();
     for (let i = 0; i < Math.min(results.length, SEARCH_RENDER_COUNT); ++i)
       this._resultsElement.appendChild(renderSearchResult(results[i]));
     this._addAllResultsButtonIfNeeded(results);
@@ -116,11 +118,21 @@ class Search {
       this._selectedElement.classList.add('selected');
   }
 
+  _addNavigateHomeItem() {
+    let main = this._resultsElement.hbox('search-item', `Navigate Home`);
+    main.classList.add('custom-search-result');
+    main.classList.add('monospace');
+    main.__route = '';
+    return main;
+  }
+
   _addAllResultsButtonIfNeeded(results) {
     let remainingResults = results.length - SEARCH_RENDER_COUNT;
     if (remainingResults <= 0)
       return;
     let main = this._resultsElement.hbox('search-item', `Show Remaining ${remainingResults} Results...`);
+    main.classList.add('custom-search-result');
+    main.classList.add('monospace');
     main.addEventListener('click', event => {
       event.consume();
       for (let i = SEARCH_RENDER_COUNT; i < results.length; ++i)
@@ -130,8 +142,6 @@ class Search {
       this._selectElement(next);
       this._searchInput.focus();
     }, false);
-    main.classList.add('show-all-results');
-    main.classList.add('monospace');
     return main;
   }
 
