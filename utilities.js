@@ -86,3 +86,10 @@ Set.prototype.first = function() {
     return null;
   return this.values().next().value;
 }
+
+Element.prototype.selfOrParentWithClass = function(className) {
+  let node = this;
+  while (node && !node.classList.contains(className))
+    node = node.parentElement;
+  return node;
+}

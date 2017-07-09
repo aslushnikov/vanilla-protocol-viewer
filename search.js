@@ -24,19 +24,15 @@ class Search {
     });
     // Activate search on any keypress
     document.addEventListener('click', event => {
-      var node = event.target;
-      while (node) {
-        if (node === this._searchInput)
-          return;
-        if (node.classList.contains('search-item')) {
-          event.consume();
-          this._cancelSearch();
-          app.navigate(node.__route);
-          return;
-        }
-        node = node.parentElement;
+      if (this._searchInput.contains(event.target))
+        return;
+      let searchItem = event.target.selfOrParentWithClass('search-item');
+      if (searchItem) {
+        event.consume();
+        this.cancelSearch();
+        app.navigate(searchItem.__route);
+        return;
       }
-      this._cancelSearch();
     });
   }
 
@@ -69,7 +65,7 @@ class Search {
     }
   }
 
-  _cancelSearch() {
+  cancelSearch() {
     this._searchInput.blur();
     this._resultsElement.style.setProperty('display', 'none');
     this._searchInput.value = '';
@@ -169,7 +165,7 @@ class Search {
   _onKeyDown(event) {
     if (event.key === "Escape" || event.keyCode === 27) {
       event.consume();
-      this._cancelSearch();
+      this.cancelSearch();
     } else if (event.key === "ArrowDown") {
       this._selectNext(event);
     } else if (event.key === "ArrowUp") {
