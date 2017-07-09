@@ -22,7 +22,8 @@ class Search {
       if (this._searchInput === document.activeElement)
         return;
       if (/\S/.test(event.key)) {
-        this._searchInput.value = '';
+        if (event.key !== '.')
+          this._searchInput.value = '';
         this._searchInput.focus();
       }
     });
