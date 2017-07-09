@@ -160,25 +160,28 @@ class Search {
     let fuzzyEntrySearch = null;
     let fuzzyDomainSearch = null;
     let dotIndex = query.indexOf('.');
-    if (dotIndex !== -1) {
+    let hasDomainQuery = dotIndex !== -1;
+    if (hasDomainQuery) {
       fuzzyDomainSearch = new FuzzySearch(query.substring(0, dotIndex));
       fuzzyEntrySearch = new FuzzySearch(query.substring(dotIndex + 1));
     } else {
+      fuzzyDomainSearch = new FuzzySearch(query);
       fuzzyEntrySearch = new FuzzySearch(query);
     }
     for (let item of items) {
       let entryMatches = [];
       let domainMatches = [];
       let entryScore = fuzzyEntrySearch.score(item.domainEntry, entryMatches);
-      if (entryScore === 0 && fuzzyEntrySearch.query().length)
+      // Bail out early if there are no method matches inside domain.
+      if (hasDomainQuery && entryScore === 0 && fuzzyEntrySearch.query().length)
         continue;
-      let domainScore = 0;
-      if (fuzzyDomainSearch) {
-        domainScore = fuzzyDomainSearch.score(item.domainName, domainMatches);
-        if (domainScore === 0)
-          continue;
-      }
-      let score = 100 * domainScore + entryScore;
+      // Do not attempt to search domain if there's a match in method.
+      let domainScore = !hasDomainQuery && entryScore ? 0 : fuzzyDomainSearch.score(item.domainName, domainMatches);
+      // Prioritize method search if there's no domain query.
+      let score = hasDomainQuery ? domainScore * 100 + entryScore : entryScore * 100 + domainScore;
+      // Bail out if we failed to match anything.
+      if (score === 0 && query.length)
+        continue;
       results.push(new Search.SearchResult(item, score, entryMatches, domainMatches));
     }
     results.sort((a, b) => {
