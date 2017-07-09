@@ -7,6 +7,8 @@ class Search {
     this._searchInput = searchHeader.querySelector('input');
     /** @type {!Array<!Search.Item>} */
     this._items = [];
+    /** @type {!Set<string>} */
+    this._domainNames = new Set();
     this._selectedElement = null;
     this._searchInput.addEventListener('input', this._onInput.bind(this), false);
     this._searchInput.addEventListener('keydown', this._onKeyDown.bind(this), false);
@@ -36,8 +38,10 @@ class Search {
   }
 
   setDomains(domains) {
+    this._domainNames.clear();
     this._items = [];
     for (var domain of domains) {
+      this._domainNames.add(domain.domain);
       for (var command of (domain.commands || [])) {
         let item = new Search.Item(domain.domain /* domainName */,
           command.name /* domainEntry */,
@@ -74,17 +78,22 @@ class Search {
     let query = this._searchInput.value.trim();
     let fuzzySearch = new FuzzySearch(query);
     let results = [];
-    for (let item of this._items) {
-      let matches = [];
-      let score = fuzzySearch.score(item.domainEntry, matches);
-      if (score > 0)
-        results.push(new Search.SearchResult(item, score, new Set(matches)));
+    if (query) {
+      for (let item of this._items) {
+        let matches = [];
+        let score = fuzzySearch.score(item.domainEntry, matches);
+        if (score > 0)
+          results.push(new Search.SearchResult(item, score, new Set(matches)));
+      }
+      results.sort((a, b) => {
+        if (b.score !== a.score)
+          return b.score - a.score;
+        return a.domainEntryMatches.first() - b.domainEntryMatches.first();
+      });
+    } else {
+      for (let item of this._items)
+        results.push(new Search.SearchResult(item, 0, new Set()));
     }
-    results.sort((a, b) => {
-      if (b.score !== a.score)
-        return b.score - a.score;
-      return a.domainEntryMatches.first() - b.domainEntryMatches.first();
-    });
     this._results.innerHTML = '';
     for (let i = 0; i < Math.min(results.length, 50); ++i)
       this._results.appendChild(renderSearchResult(results[i]));
