@@ -19,7 +19,7 @@ class Search {
 
     // Activate search on any keypress
     document.addEventListener('keypress', event => {
-      if (/[a-zA-Z]/.test(event.key))
+      if (/\S/.test(event.key))
         this._searchInput.focus();
     });
     // Activate search on any keypress
