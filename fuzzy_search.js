@@ -44,7 +44,6 @@ class FuzzySearch {
     this._score = new Int32Array(20 * 100);
     this._sequence = new Int32Array(20 * 100);
     this._dataUpperCase = '';
-    this._fileNameIndex = 0;
   }
 
   /**
@@ -64,7 +63,6 @@ class FuzzySearch {
     var score = this._score;
     var sequence = /** @type {!Int32Array} */ (this._sequence);
     this._dataUpperCase = data.toUpperCase();
-    this._fileNameIndex = data.lastIndexOf('/');
     for (var i = 0; i < n; ++i) {
       for (var j = 0; j < m; ++j) {
         var skipCharScore = j === 0 ? 0 : score[i * m + j - 1];
@@ -82,22 +80,7 @@ class FuzzySearch {
     }
     if (matchIndexes)
       this._restoreMatchIndexes(sequence, n, m, matchIndexes);
-    var maxDataLength = 256;
-    return score[n * m - 1] * maxDataLength + (maxDataLength - data.length);
-  }
-
-  /**
-   * @param {string} data
-   * @param {number} j
-   * @return {boolean}
-   */
-  _testWordStart(data, j) {
-    if (j === 0)
-      return true;
-
-    var prevChar = data.charAt(j - 1);
-    return prevChar === '_' || prevChar === '-' || prevChar === '/' ||
-        (data[j - 1] !== this._dataUpperCase[j - 1] && data[j] === this._dataUpperCase[j]);
+    return score[n * m - 1];
   }
 
   /**
@@ -128,55 +111,6 @@ class FuzzySearch {
    * @param {string} data
    * @param {number} i
    * @param {number} j
-   * @return {number}
-   */
-  _singleCharScore(query, data, i, j) {
-    var isWordStart = this._testWordStart(data, j);
-    var isFileName = j > this._fileNameIndex;
-    var isPathTokenStart = j === 0 || data[j - 1] === '/';
-    var isCapsMatch = query[i] === data[j] && query[i] === this._queryUpperCase[i];
-    var score = 10;
-    if (isPathTokenStart)
-      score += 4;
-    if (isWordStart)
-      score += 2;
-    if (isCapsMatch)
-      score += 6;
-    if (isFileName)
-      score += 4;
-    // promote the case of making the whole match in the filename
-    if (j === this._fileNameIndex + 1 && i === 0)
-      score += 5;
-    if (isFileName && isWordStart)
-      score += 3;
-    return score;
-  }
-
-  /**
-   * @param {string} query
-   * @param {string} data
-   * @param {number} i
-   * @param {number} j
-   * @param {number} sequenceLength
-   * @return {number}
-   */
-  _sequenceCharScore(query, data, i, j, sequenceLength) {
-    var isFileName = j > this._fileNameIndex;
-    var isPathTokenStart = j === 0 || data[j - 1] === '/';
-    var score = 10;
-    if (isFileName)
-      score += 4;
-    if (isPathTokenStart)
-      score += 5;
-    score += sequenceLength * 4;
-    return score;
-  }
-
-  /**
-   * @param {string} query
-   * @param {string} data
-   * @param {number} i
-   * @param {number} j
    * @param {number} consecutiveMatch
    * @return {number}
    */
@@ -184,10 +118,12 @@ class FuzzySearch {
     if (this._queryUpperCase[i] !== this._dataUpperCase[j])
       return 0;
 
-    if (!consecutiveMatch)
-      return this._singleCharScore(query, data, i, j);
-    else
-      return this._sequenceCharScore(query, data, i, j - consecutiveMatch, consecutiveMatch);
+    var isCapsMatch = query[i] === data[j] && query[i] === this._queryUpperCase[i];
+    var score = 10;
+    if (isCapsMatch)
+      score += 6;
+    score += consecutiveMatch * 4;
+    return score;
   }
 
   /**
