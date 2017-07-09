@@ -153,46 +153,27 @@ class Search {
     let results = [];
     if (!query) {
       for (let item of items)
-        results.push(new Search.SearchResult(item, 0, [], []));
+        results.push(new Search.SearchResult(item, 0, []));
       return results;
     }
 
-    let fuzzyEntrySearch = null;
-    let fuzzyDomainSearch = null;
-    let dotIndex = query.indexOf('.');
-    let hasDomainQuery = dotIndex !== -1;
-    if (hasDomainQuery) {
-      fuzzyDomainSearch = new FuzzySearch(query.substring(0, dotIndex));
-      fuzzyEntrySearch = new FuzzySearch(query.substring(dotIndex + 1));
-    } else {
-      fuzzyDomainSearch = new FuzzySearch(query);
-      fuzzyEntrySearch = new FuzzySearch(query);
-    }
+    let fuzzySearch = new FuzzySearch(query);
     for (let item of items) {
-      let entryMatches = [];
-      let domainMatches = [];
-      let entryScore = fuzzyEntrySearch.score(item.domainEntry, entryMatches);
-      // Bail out early if there are no method matches inside domain.
-      if (hasDomainQuery && entryScore === 0 && fuzzyEntrySearch.query().length)
+      let matches = [];
+      let score = fuzzySearch.score(item.title, matches);
+      if (score === 0)
         continue;
-      // Do not attempt to search domain if there's a match in method.
-      let domainScore = !hasDomainQuery && entryScore ? 0 : fuzzyDomainSearch.score(item.domainName, domainMatches);
-      // Prioritize method search if there's no domain query.
-      let score = hasDomainQuery ? domainScore * 100 + entryScore : entryScore * 100 + domainScore;
-      // Bail out if we failed to match anything.
-      if (score === 0 && query.length)
-        continue;
-      results.push(new Search.SearchResult(item, score, entryMatches, domainMatches));
+      results.push(new Search.SearchResult(item, score, matches));
     }
     results.sort((a, b) => {
       const scoreDiff = b.score - a.score;
       if (scoreDiff)
         return scoreDiff;
       // Prefer left-most search results.
-      const startDiff = a.domainEntryMatches[0] - b.domainEntryMatches[0];
+      const startDiff = a.matches[0] - b.matches[0];
       if (startDiff)
         return startDiff;
-      return a.item.domainEntry.length - b.item.domainEntry.length;
+      return a.item.title.length - b.item.title.length;
     });
     return results;
   }
@@ -272,9 +253,8 @@ function renderSearchResult(searchResult) {
     let container = main.div('search-item-main');
     let p1 = container.el('div', 'search-item-title monospace');
     let domainElement = p1.span('search-item-title-domain');
-    domainElement.appendChild(renderTextWithMatches(item.domainName, searchResult.domainNameMatches));
-    domainElement.textNode('.');
-    p1.appendChild(renderTextWithMatches(item.domainEntry, searchResult.domainEntryMatches));
+    domainElement.appendChild(renderTextWithMatches(item.title, searchResult.matches, 0, item.domainName.length + 1));
+    p1.appendChild(renderTextWithMatches(item.title, searchResult.matches, item.domainName.length + 1, item.title.length));
     let p2 = container.el('div',  'search-item-description');
     p2.innerHTML = item.description;
   }
@@ -285,23 +265,25 @@ function renderSearchResult(searchResult) {
 /**
  * @param {string} text
  * @param {!Array<number>} matches
+ * @param {number} fromIndex
+ * @param {number} fromIndex
  * @return {!Element}
  */
-function renderTextWithMatches(text, matches) {
+function renderTextWithMatches(text, matches, fromIndex, toIndex) {
   if (!matches.length)
     return E.textNode(text);
   let result = document.createDocumentFragment();
   let insideMatch = false;
-  let currentIndex = 0;
+  let currentIndex = fromIndex;
   let matchIndex = new Set(matches);
-  for (let i = 0; i < text.length; ++i) {
+  for (let i = fromIndex; i < toIndex; ++i) {
     if (insideMatch !== matchIndex.has(i)) {
       add(currentIndex, i, insideMatch);
       insideMatch = matchIndex.has(i);
       currentIndex = i;
     }
   }
-  add(currentIndex, text.length, insideMatch);
+  add(currentIndex, toIndex, insideMatch);
   return result;
 
   /**
@@ -339,6 +321,7 @@ Search.Item = class {
     this.domainEntry = domainEntry;
     this.type = itemType;
     this.description = description || '';
+    this.title = this.domainName + '.' + this.domainEntry;
     this.route = `#${domainName}.${domainEntry}`
   }
 }
@@ -347,14 +330,12 @@ Search.SearchResult = class {
   /**
    * @param {!Search.Item} item
    * @param {number} score
-   * @param {!Array<number>} domainEntryMatches
-   * @param {!Array<number>} domainNameMatches
+   * @param {!Array<number>} matches
    */
-  constructor(item, score, domainEntryMatches, domainNameMatches) {
+  constructor(item, score, matches) {
     this.item = item;
     this.score = score;
-    this.domainEntryMatches = domainEntryMatches;
-    this.domainNameMatches = domainNameMatches;
+    this.matches = matches;
   }
 }
 
