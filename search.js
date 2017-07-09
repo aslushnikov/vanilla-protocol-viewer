@@ -80,7 +80,11 @@ class Search {
       if (score > 0)
         results.push(new Search.SearchResult(item, score, new Set(matches)));
     }
-    results.sort((a, b) => b.score - a.score);
+    results.sort((a, b) => {
+      if (b.score !== a.score)
+        return b.score - a.score;
+      return a.domainEntryMatches.first() - b.domainEntryMatches.first();
+    });
     this._results.innerHTML = '';
     for (let i = 0; i < Math.min(results.length, 50); ++i)
       this._results.appendChild(renderSearchResult(results[i]));

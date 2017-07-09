@@ -81,3 +81,8 @@ Array.prototype.last = function() {
   return this.length ? this[this.length - 1] : undefined;
 }
 
+Set.prototype.first = function() {
+  if (!this.size)
+    return null;
+  return this.values().next().value;
+}
