@@ -82,6 +82,7 @@ code {
 }
 
 #search input {
+  -webkit-appearance: none;
   margin: 0 auto;
   background: #3f51b5;
   text-align: center;
