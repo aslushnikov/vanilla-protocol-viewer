@@ -47,6 +47,13 @@ class FuzzySearch {
   }
 
   /**
+   * @return {string}
+   */
+  query() {
+    return this._query;
+  }
+
+  /**
    * @param {string} data
    * @param {?Array<number>} matchIndexes
    * @return {number}
