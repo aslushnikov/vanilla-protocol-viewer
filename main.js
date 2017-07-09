@@ -6,7 +6,7 @@ let PROTOCOLS = {
   'browser_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/browser_protocol.json',
   'js_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json',
  * */
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
   let sidebar = document.getElementById('sidebar');
@@ -14,54 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.app = new App(sidebar, content);
 });
-
-class Router {
-  /**
-   * @param {function(?)} unknownRouteHandler
-   */
-  constructor(unknownRouteHandler) {
-    this._routes = new Map();
-    this._unknownRouteHandler = unknownRouteHandler;
-    window.addEventListener("popstate", () => this._processRoute());
-  }
-
-  /**
-   * @param {!RegExp} regex
-   * @param {function(?)} handler
-   */
-  setRoute(regex, handler) {
-    this._routes.set(regex, handler)
-  }
-
-  /**
-   * @param {string} route
-   */
-  navigate(route) {
-    if (window.location.hash === route)
-      this._processRoute();
-    else
-      window.location.hash = route;
-  }
-
-  /**
-   * @return {string}
-   */
-  route() {
-    return window.location.hash;
-  }
-
-  _processRoute() {
-    let route = (window.location.hash || '#').substring(1);
-    for (let regex of this._routes.keys()) {
-      var matches = route.match(regex);
-      if (matches) {
-        this._routes.get(regex).call(null, route, ...matches.slice(1));
-        return;
-      }
-    }
-    this._unknownRouteHandler.call(null, route);
-  }
-}
 
 class App {
   /**
@@ -138,13 +90,61 @@ class App {
   }
 }
 
+class Router {
+  /**
+   * @param {function(?)} unknownRouteHandler
+   */
+  constructor(unknownRouteHandler) {
+    this._routes = new Map();
+    this._unknownRouteHandler = unknownRouteHandler;
+    window.addEventListener("popstate", () => this._processRoute());
+  }
+
+  /**
+   * @param {!RegExp} regex
+   * @param {function(?)} handler
+   */
+  setRoute(regex, handler) {
+    this._routes.set(regex, handler)
+  }
+
+  /**
+   * @param {string} route
+   */
+  navigate(route) {
+    if (window.location.hash === route)
+      this._processRoute();
+    else
+      window.location.hash = route;
+  }
+
+  /**
+   * @return {string}
+   */
+  route() {
+    return window.location.hash;
+  }
+
+  _processRoute() {
+    let route = (window.location.hash || '#').substring(1);
+    for (let regex of this._routes.keys()) {
+      var matches = route.match(regex);
+      if (matches) {
+        this._routes.get(regex).call(null, route, ...matches.slice(1));
+        return;
+      }
+    }
+    this._unknownRouteHandler.call(null, route);
+  }
+}
+
+
 function renderSidebar(domainNames) {
   domainNames.sort();
   let sidebar = document.getElementById('sidebar');
   for (let name of domainNames) {
-    let a = sidebar.el('a', 'domain-link');
-    a.href = '#' + name;
-    a.textContent = name;
+    let a = sidebar.a('#' + name, name);
+    a.classList.add('domain-link');
   }
 }
 

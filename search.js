@@ -154,10 +154,14 @@ class Search {
         results.push(new Search.SearchResult(item, score, new Set(matches)));
     }
     results.sort((a, b) => {
-      if (b.score !== a.score)
-        return b.score - a.score;
+      const scoreDiff = b.score - a.score;
+      if (scoreDiff)
+        return scoreDiff;
       // Prefer left-most search results.
-      return a.domainEntryMatches.first() - b.domainEntryMatches.first();
+      const startDiff = a.domainEntryMatches.first() - b.domainEntryMatches.first();
+      if (startDiff)
+        return startDiff;
+      return a.item.domainEntry.length - b.item.domainEntry.length;
     });
     return results;
   }
