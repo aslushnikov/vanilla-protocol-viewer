@@ -195,16 +195,17 @@ class Search {
   }
 
   _onKeyDown(event) {
-    if (event.key === "Escape" || event.keyCode === 27) {
+    if (event.key === 'Escape' || event.keyCode === 27) {
       event.consume();
       this.cancelSearch();
-    } else if (event.key === "ArrowDown") {
+    } else if (event.key === 'ArrowDown') {
       this._selectNext(event);
-    } else if (event.key === "ArrowUp") {
+    } else if (event.key === 'ArrowUp') {
       this._selectPrevious(event);
-    } else if (event.key === "Enter") {
+    } else if (event.key === 'Enter' || event.key === ' ') {
       event.consume();
-      this._selectedElement.click();
+      if (this._selectedElement);
+        this._selectedElement.click();
     }
   }
 
