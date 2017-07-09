@@ -163,7 +163,7 @@ class Search {
     let results = [];
     if (!query) {
       for (let item of items)
-        results.push(new Search.SearchResult(item, 0, new Set()));
+        results.push(new Search.SearchResult(item, 0, []));
       return results;
     }
 
@@ -172,14 +172,14 @@ class Search {
       let matches = [];
       let score = fuzzySearch.score(item.domainEntry, matches);
       if (score > 0)
-        results.push(new Search.SearchResult(item, score, new Set(matches)));
+        results.push(new Search.SearchResult(item, score, matches));
     }
     results.sort((a, b) => {
       const scoreDiff = b.score - a.score;
       if (scoreDiff)
         return scoreDiff;
       // Prefer left-most search results.
-      const startDiff = a.domainEntryMatches.first() - b.domainEntryMatches.first();
+      const startDiff = a.domainEntryMatches[0] - b.domainEntryMatches[0];
       if (startDiff)
         return startDiff;
       return a.item.domainEntry.length - b.item.domainEntry.length;
@@ -276,17 +276,20 @@ function renderSearchResult(searchResult) {
 
 /**
  * @param {string} text
- * @param {!Set<number>} matches
- * @return {!DocumentFragment}
+ * @param {!Array<number>} matches
+ * @return {!Element}
  */
 function renderTextWithMatches(text, matches) {
+  if (!matches.length)
+    return E.textNode(text);
   let result = document.createDocumentFragment();
   let insideMatch = false;
   let currentIndex = 0;
+  let matchIndex = new Set(matches);
   for (let i = 0; i < text.length; ++i) {
-    if (insideMatch !== matches.has(i)) {
+    if (insideMatch !== matchIndex.has(i)) {
       add(currentIndex, i, insideMatch);
-      insideMatch = matches.has(i);
+      insideMatch = matchIndex.has(i);
       currentIndex = i;
     }
   }
@@ -336,7 +339,7 @@ Search.SearchResult = class {
   /**
    * @param {!Search.Item} item
    * @param {number} score
-   * @param {!Set<number>} domainEntryMatches
+   * @param {!Array<number>} domainEntryMatches
    */
   constructor(item, score, domainEntryMatches) {
     this.item = item;
