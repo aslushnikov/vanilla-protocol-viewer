@@ -297,3 +297,8 @@ span.experimental {
 .search-highlight {
   background-color: yellow;
 }
+
+.search-results-message {
+  margin: 20px auto;
+  max-width: 500px;
+}

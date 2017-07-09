@@ -41,7 +41,7 @@ class Search {
     this._domainNames.clear();
     this._items = [];
     for (var domain of domains) {
-      this._domainNames.add(domain.domain);
+      this._domainNames.add(domain.domain.toLowerCase());
       for (var command of (domain.commands || [])) {
         let item = new Search.Item(domain.domain /* domainName */,
           command.name /* domainEntry */,
@@ -76,24 +76,18 @@ class Search {
   _onInput() {
     this._selectedElement = null;
     let query = this._searchInput.value.trim();
-    let fuzzySearch = new FuzzySearch(query);
-    let results = [];
-    if (query) {
-      for (let item of this._items) {
-        let matches = [];
-        let score = fuzzySearch.score(item.domainEntry, matches);
-        if (score > 0)
-          results.push(new Search.SearchResult(item, score, new Set(matches)));
+    let items = this._items;
+    let dotIndex = query.indexOf('.');
+    if (dotIndex !== -1) {
+      let domainName = query.substring(0, dotIndex).toLowerCase();
+      if (!this._domainNames.has(domainName)) {
+        this._renderMessage('Domain not found: ' + domainName);
+        return;
       }
-      results.sort((a, b) => {
-        if (b.score !== a.score)
-          return b.score - a.score;
-        return a.domainEntryMatches.first() - b.domainEntryMatches.first();
-      });
-    } else {
-      for (let item of this._items)
-        results.push(new Search.SearchResult(item, 0, new Set()));
+      items = items.filter(item => item.domainName.toLowerCase() === domainName);
+      query = query.substring(dotIndex + 1);
     }
+    let results = this._doSearch(items, query);
     this._results.innerHTML = '';
     for (let i = 0; i < Math.min(results.length, 50); ++i)
       this._results.appendChild(renderSearchResult(results[i]));
@@ -102,6 +96,43 @@ class Search {
     this._results.style.setProperty('display', 'block');
     if (this._selectedElement)
       this._selectedElement.classList.add('selected');
+  }
+
+  /**
+   * @param {string} text
+   */
+  _renderMessage(text) {
+    this._results.innerHTML = '';
+    this._results.box('search-results-message', text);
+  }
+
+  /**
+   * @param {!Array<!Search.Item>} items
+   * @param {string} query
+   * @return {!Array<!Search.SearchResult>}
+   */
+  _doSearch(items, query) {
+    let results = [];
+    if (!query) {
+      for (let item of items)
+        results.push(new Search.SearchResult(item, 0, new Set()));
+      return results;
+    }
+
+    let fuzzySearch = new FuzzySearch(query);
+    for (let item of items) {
+      let matches = [];
+      let score = fuzzySearch.score(item.domainEntry, matches);
+      if (score > 0)
+        results.push(new Search.SearchResult(item, score, new Set(matches)));
+    }
+    results.sort((a, b) => {
+      if (b.score !== a.score)
+        return b.score - a.score;
+      // Prefer left-most search results.
+      return a.domainEntryMatches.first() - b.domainEntryMatches.first();
+    });
+    return results;
   }
 
   _onKeyDown(event) {
