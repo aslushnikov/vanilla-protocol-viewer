@@ -12,7 +12,7 @@ class Search {
     this._selectedElement = null;
     this._searchInput.addEventListener('input', this._onInput.bind(this), false);
     this._searchInput.addEventListener('keydown', this._onKeyDown.bind(this), false);
-    this._results = resultsElement;
+    this._resultsElement = resultsElement;
 
     // Activate search on any keypress
     document.addEventListener('keypress', event => {
@@ -68,7 +68,7 @@ class Search {
 
   _cancelSearch() {
     this._searchInput.blur();
-    this._results.style.setProperty('display', 'none');
+    this._resultsElement.style.setProperty('display', 'none');
     this._searchInput.value = '';
     app.focusContent();
   }
@@ -92,21 +92,30 @@ class Search {
       this._renderMessage('Nothing is found.');
       return;
     }
-    this._results.innerHTML = '';
+    this._resultsElement.innerHTML = '';
     for (let i = 0; i < Math.min(results.length, 50); ++i)
-      this._results.appendChild(renderSearchResult(results[i]));
-    this._selectedElement = this._results.firstChild;
-    this._results.style.setProperty('display', 'block');
+      this._resultsElement.appendChild(renderSearchResult(results[i]));
+    if (results.length > 50)
+      this._resultsElement.appendChild(this._moreResultsButton());
+    this._selectedElement = this._resultsElement.firstChild;
+    this._resultsElement.style.setProperty('display', 'block');
     if (this._selectedElement)
       this._selectedElement.classList.add('selected');
+  }
+
+  _moreResultsButton() {
+    let main = E.hbox('search-item', 'Show More Results...');
+    main.classList.add('show-more-results');
+    main.classList.add('monospace');
+    return main;
   }
 
   /**
    * @param {string} text
    */
   _renderMessage(text) {
-    this._results.innerHTML = '';
-    this._results.box('search-results-message')
+    this._resultsElement.innerHTML = '';
+    this._resultsElement.box('search-results-message')
       .el('h4', '', text);
   }
 
@@ -161,7 +170,7 @@ class Search {
     this._selectedElement.classList.remove('selected');
     this._selectedElement = this._selectedElement.nextSibling;
     if (!this._selectedElement)
-      this._selectedElement = this._results.firstChild;
+      this._selectedElement = this._resultsElement.firstChild;
     this._selectedElement.scrollIntoViewIfNeeded(false);
     this._selectedElement.classList.add('selected');
   }
@@ -173,7 +182,7 @@ class Search {
     this._selectedElement.classList.remove('selected');
     this._selectedElement = this._selectedElement.previousSibling;
     if (!this._selectedElement)
-      this._selectedElement = this._results.lastChild;
+      this._selectedElement = this._resultsElement.lastChild;
     this._selectedElement.scrollIntoViewIfNeeded(false);
     this._selectedElement.classList.add('selected');
   }

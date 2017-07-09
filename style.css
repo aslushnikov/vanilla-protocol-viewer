@@ -271,9 +271,6 @@ span.experimental {
   max-width: 1000px;
 }
 
-#sresults .search-item-title {
-}
-
 #sresults .search-item-description {
   font-size: 90%;
 }
@@ -302,4 +299,9 @@ span.experimental {
   margin: 20px auto;
   max-width: 500px;
   text-align: center;
+}
+
+.show-more-results {
+  justify-content: center;
+  height: 40px;
 }
