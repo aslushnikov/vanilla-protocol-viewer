@@ -71,12 +71,14 @@ class Search {
 
   _onInput() {
     this._selectedElement = null;
-    let query = this._searchInput.value.toLowerCase();
+    let query = this._searchInput.value.trim();
+    let fuzzySearch = new FuzzySearch(query);
     let results = [];
     for (let item of this._items) {
-      let result = Search.SearchResult.create(item, query);
-      if (result)
-        results.push(result);
+      let matches = [];
+      let score = fuzzySearch.score(item.domainEntry, matches);
+      if (score > 0)
+        results.push(new Search.SearchResult(item, score, new Set(matches)));
     }
     results.sort((a, b) => b.score - a.score);
     this._results.innerHTML = '';
@@ -240,40 +242,5 @@ Search.SearchResult = class {
     this.score = score;
     this.domainEntryMatches = domainEntryMatches;
   }
-
-  /**
-   * @param {!Search.Item} item
-   * @param {string} query
-   * @param {?Search.SearchResult}
-   */
-  static create(item, query) {
-    let matches = search(item.domainEntry.toLowerCase(), query);
-    if (!matches)
-      return null;
-    // The shorter item length, the better.
-    let score = -item.domainEntry.length/10000;
-    // The less is difference between matches, the better.
-    score += 100 * Math.pow(query.length / (matches.last() - matches[0] + 1), 2);
-    // The closer the first letter to start - the better.
-    score += (item.domainEntry.length - matches[0]) / item.domainEntry.length;
-    return new Search.SearchResult(item, score, new Set(matches));
-  }
-}
-
-/**
- * @param {string} text
- * @param {string} query
- * @return {?Array<number>}
- */
-function search(text, query) {
-  let result = [];
-  let lastIndex = -1;
-  for (let i = 0; i < query.length; ++i) {
-    lastIndex = text.indexOf(query[i], lastIndex + 1);
-    if (lastIndex === -1)
-      return null;
-    result.push(lastIndex);
-  }
-  return result;
 }
 
