@@ -267,16 +267,12 @@ function renderSearchResult(searchResult) {
     // Render Name and Description
     let container = main.div('search-item-main');
     let p1 = container.el('div', 'search-item-title monospace');
+    let domainElement = p1.span('search-item-title-domain');
+    domainElement.appendChild(renderTextWithMatches(item.domainName, searchResult.domainNameMatches));
+    domainElement.textNode('.');
     p1.appendChild(renderTextWithMatches(item.domainEntry, searchResult.domainEntryMatches));
     let p2 = container.el('div',  'search-item-description');
     p2.innerHTML = item.description;
-  }
-  {
-    // Render domain
-    // Render Name and Description
-    let container = main.vbox('search-item-domain');
-    let span = container.span();
-    span.appendChild(renderTextWithMatches(item.domainName, searchResult.domainNameMatches));
   }
   main.__route = item.route;
   return main;

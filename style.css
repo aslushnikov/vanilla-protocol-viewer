@@ -295,22 +295,6 @@ span.experimental {
   font-size: 90%;
 }
 
-#sresults .search-item-domain {
-  flex: 0 1 auto;
-  text-align: right;
-  color: black;
-  word-wrap: break-word;
-  max-width: 250px;
-  margin: 10px 30px;
-}
-
-#sresults .search-item-domain::after {
-  content: "domain";
-  opacity: .6;
-  font-size: 70%;
-  display: block;
-}
-
 .search-highlight {
   background-color: yellow;
 }
@@ -324,4 +308,8 @@ span.experimental {
 .custom-search-result {
   justify-content: center;
   height: 53px;
+}
+
+.search-item-title-domain {
+  color: hsla(0, 0%, 57%, 1);
 }
