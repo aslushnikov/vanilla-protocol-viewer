@@ -1,3 +1,6 @@
+// Number of search results to render immediately.
+const SEARCH_RENDER_COUNT = 50;
+
 class Search {
   /**
    * @param {!Element} searchHeader
@@ -93,19 +96,30 @@ class Search {
       return;
     }
     this._resultsElement.innerHTML = '';
-    for (let i = 0; i < Math.min(results.length, 50); ++i)
+    for (let i = 0; i < Math.min(results.length, SEARCH_RENDER_COUNT); ++i)
       this._resultsElement.appendChild(renderSearchResult(results[i]));
-    if (results.length > 50)
-      this._resultsElement.appendChild(this._moreResultsButton());
+    this._addAllResultsButtonIfNeeded(results);
     this._selectedElement = this._resultsElement.firstChild;
     this._resultsElement.style.setProperty('display', 'block');
     if (this._selectedElement)
       this._selectedElement.classList.add('selected');
   }
 
-  _moreResultsButton() {
-    let main = E.hbox('search-item', 'Show More Results...');
-    main.classList.add('show-more-results');
+  _addAllResultsButtonIfNeeded(results) {
+    let remainingResults = results.length - SEARCH_RENDER_COUNT;
+    if (remainingResults <= 0)
+      return;
+    let main = this._resultsElement.hbox('search-item', `Show Remaining ${remainingResults} Results...`);
+    main.addEventListener('click', event => {
+      event.consume();
+      for (let i = SEARCH_RENDER_COUNT; i < results.length; ++i)
+        this._resultsElement.appendChild(renderSearchResult(results[i]));
+      let next = main.nextSibling;
+      main.remove();
+      this._selectElement(next);
+      this._searchInput.focus();
+    }, false);
+    main.classList.add('show-all-results');
     main.classList.add('monospace');
     return main;
   }
@@ -158,8 +172,7 @@ class Search {
       this._selectPrevious(event);
     } else if (event.key === "Enter") {
       event.consume();
-      this._cancelSearch();
-      app.navigate(this._selectedElement.__route);
+      this._selectedElement.click();
     }
   }
 
@@ -167,24 +180,30 @@ class Search {
     if (!this._selectedElement)
       return;
     event.consume();
-    this._selectedElement.classList.remove('selected');
-    this._selectedElement = this._selectedElement.nextSibling;
-    if (!this._selectedElement)
-      this._selectedElement = this._resultsElement.firstChild;
-    this._selectedElement.scrollIntoViewIfNeeded(false);
-    this._selectedElement.classList.add('selected');
+    let next = this._selectedElement.nextSibling;
+    if (!next)
+      next = this._resultsElement.firstChild;
+    this._selectElement(next);
   }
 
   _selectPrevious(event) {
     if (!this._selectedElement)
       return;
     event.consume();
-    this._selectedElement.classList.remove('selected');
-    this._selectedElement = this._selectedElement.previousSibling;
-    if (!this._selectedElement)
-      this._selectedElement = this._resultsElement.lastChild;
-    this._selectedElement.scrollIntoViewIfNeeded(false);
-    this._selectedElement.classList.add('selected');
+    let previous = this._selectedElement.previousSibling;
+    if (!previous)
+      previous = this._resultsElement.lastChild;
+    this._selectElement(previous);
+  }
+
+  _selectElement(item) {
+    if (this._selectedElement)
+      this._selectedElement.classList.remove('selected');
+    this._selectedElement = item;
+    if (this._selectedElement) {
+      this._selectedElement.scrollIntoViewIfNeeded(false);
+      this._selectedElement.classList.add('selected');
+    }
   }
 }
 
