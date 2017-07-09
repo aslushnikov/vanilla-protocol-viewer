@@ -31,6 +31,12 @@ class App {
     this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, (route, domain, method) => this._onNavigateDomain(route, domain, method));
     this._router.setRoute(/^$/, this._onNavigateHome.bind(this));
     this._initialize();
+
+    let homeButton = document.querySelector('.home');
+    homeButton.addEventListener('click', event => {
+      event.consume();
+      this._router.navigate('');
+    }, false);
   }
 
   focusContent() {

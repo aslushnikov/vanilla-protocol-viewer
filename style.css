@@ -60,6 +60,19 @@ code {
   justify-content: center;
 }
 
+#search .home {
+  opacity: 0.5;
+  padding: 10px;
+}
+
+#search .home:hover {
+  opacity: 0.85;
+}
+
+#search .home:active {
+  opacity: 1;
+}
+
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: rgba(255, 255, 255, 0.5);
 }
@@ -69,11 +82,12 @@ code {
 }
 
 #search input {
+  margin: 0 auto;
   background: #3f51b5;
   text-align: center;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.52);
-  padding: 0 20px 3px 20px;
+  padding: 0 0 3px 20px;
   font-size: 20px;
   color: white;
   width: 300px;
