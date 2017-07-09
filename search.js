@@ -251,12 +251,10 @@ Search.SearchResult = class {
     if (index === -1)
       return null;
     let matches = new Set();
-    // The shorter item length, the better.
-    let score = -item.domainEntry.length;
     for (let i = index; i < index + query.length; ++i)
       matches.add(i);
-    // Promote items which have matches.
-    score += 1000;
+    // The shorter item length, the better.
+    let score = -item.domainEntry.length;
     return new Search.SearchResult(item, score, matches);
   }
 }
