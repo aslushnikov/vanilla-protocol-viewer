@@ -88,6 +88,7 @@ class Search {
 
   _onInput() {
     this._selectedElement = null;
+    this._resultsElement.style.setProperty('display', 'block');
     let query = this._searchInput.value.trim();
     let items = this._items;
     let dotIndex = query.indexOf('.');
@@ -110,7 +111,6 @@ class Search {
       this._resultsElement.appendChild(renderSearchResult(results[i]));
     this._addAllResultsButtonIfNeeded(results);
     this._selectedElement = this._resultsElement.firstChild;
-    this._resultsElement.style.setProperty('display', 'block');
     if (this._selectedElement)
       this._selectedElement.classList.add('selected');
   }
