@@ -132,8 +132,9 @@ class App {
   _onNavigateHome() {
     document.title = 'Vanilla Protocol Viewer';
     this._contentElement.innerHTML = '';
-    let e = renderLanding();
-    this._contentElement.appendChild(e);
+    var template = document.querySelector('#landing');
+    var clone = document.importNode(template.content, true);
+    this._contentElement.appendChild(clone);
   }
 }
 
@@ -151,47 +152,5 @@ function renderError(error) {
   let main = E.box();
   main.el('h2', '', 'Error');
   main.p('', error);
-  return main;
-}
-
-function renderLanding() {
-  let main = E.div();
-  {
-    let e = main.box();
-    let h2 = e.el('h2');
-    h2.textContent = 'Vanilla Protocol Viewer';
-    let div = e.div();
-    div.text('Protocols fetched from ');
-    div.a('https://github.com/ChromeDevTools/devtools-protocol', 'ChromeDevTools/devtools-protocol');
-    let ul = div.el('ul');
-    var protocolNames = Object.keys(PROTOCOLS);
-    for (let protocolName in PROTOCOLS) {
-      let li = ul.el('li');
-      let a = li.el('a');
-      a.href = PROTOCOLS[protocolName];
-      a.textContent = protocolName;
-      a.target = '_blank';
-    }
-  }
-  {
-    e = main.box();
-    let h4 = e.el('h4');
-    h4.textContent = 'Features';
-    let ul = e.el('ul');
-    let li = ul.el('li');
-    li.code('Blazingly fast ');
-    li.text('There are no roundtrips to the server to perform search or to render a page.');
-    li = ul.el('li');
-    li.code('Instant Search ');
-    li.text('Start typing anywhere to initiate searching.');
-    li = ul.el('li');
-    li.code('Zero-Dependency ')
-    li.text('This is a small self-contained project in less then 1000LOC.');
-    li = ul.el('li');
-    li.code('No Buildsteps ');
-    li.text('Written in vanilla JavaScript / HTML / CSS.');
-    e.text('Inspired by ');
-    e.a('https://chromedevtools.github.io/devtools-protocol/', 'Chrome DevTools Protocol Viewer');
-  }
   return main;
 }
