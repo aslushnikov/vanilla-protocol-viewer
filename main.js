@@ -1,11 +1,10 @@
 let PROTOCOLS = {
+/**
   'browser_protocol.json':  './browser_protocol.json',
   'js_protocol.json':  './js_protocol.json',
-/**
- * these could be pointing to local versions of protocol:
+ * */
   'browser_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/browser_protocol.json',
   'js_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json',
- * */
 };
 
 document.addEventListener('DOMContentLoaded', () => {
