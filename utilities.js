@@ -76,3 +76,8 @@ Event.prototype.consume = function() {
     this.preventDefault();
     this.stopPropagation();
 }
+
+Array.prototype.last = function() {
+  return this.length ? this[this.length - 1] : undefined;
+}
+

@@ -71,7 +71,7 @@ class Search {
 
   _onInput() {
     this._selectedElement = null;
-    let query = this._searchInput.value;
+    let query = this._searchInput.value.toLowerCase();
     let results = [];
     for (let item of this._items) {
       let result = Search.SearchResult.create(item, query);
@@ -247,14 +247,33 @@ Search.SearchResult = class {
    * @param {?Search.SearchResult}
    */
   static create(item, query) {
-    let index = item.domainEntry.toLowerCase().indexOf(query.toLowerCase());
-    if (index === -1)
+    let matches = search(item.domainEntry.toLowerCase(), query);
+    if (!matches)
       return null;
-    let matches = new Set();
-    for (let i = index; i < index + query.length; ++i)
-      matches.add(i);
     // The shorter item length, the better.
-    let score = -item.domainEntry.length;
-    return new Search.SearchResult(item, score, matches);
+    let score = -item.domainEntry.length/10000;
+    // The less is difference between matches, the better.
+    score += 100 * Math.pow(query.length / (matches.last() - matches[0] + 1), 2);
+    // The closer the first letter to start - the better.
+    score += (item.domainEntry.length - matches[0]) / item.domainEntry.length;
+    return new Search.SearchResult(item, score, new Set(matches));
   }
 }
+
+/**
+ * @param {string} text
+ * @param {string} query
+ * @return {?Array<number>}
+ */
+function search(text, query) {
+  let result = [];
+  let lastIndex = -1;
+  for (let i = 0; i < query.length; ++i) {
+    lastIndex = text.indexOf(query[i], lastIndex + 1);
+    if (lastIndex === -1)
+      return null;
+    result.push(lastIndex);
+  }
+  return result;
+}
+
