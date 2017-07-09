@@ -301,4 +301,5 @@ span.experimental {
 .search-results-message {
   margin: 20px auto;
   max-width: 500px;
+  text-align: center;
 }

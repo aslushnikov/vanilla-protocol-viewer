@@ -88,10 +88,13 @@ class Search {
       query = query.substring(dotIndex + 1);
     }
     let results = this._doSearch(items, query);
+    if (results.length === 0) {
+      this._renderMessage('Nothing is found.');
+      return;
+    }
     this._results.innerHTML = '';
     for (let i = 0; i < Math.min(results.length, 50); ++i)
       this._results.appendChild(renderSearchResult(results[i]));
-
     this._selectedElement = this._results.firstChild;
     this._results.style.setProperty('display', 'block');
     if (this._selectedElement)
@@ -103,7 +106,8 @@ class Search {
    */
   _renderMessage(text) {
     this._results.innerHTML = '';
-    this._results.box('search-results-message', text);
+    this._results.box('search-results-message')
+      .el('h4', '', text);
   }
 
   /**
