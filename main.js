@@ -3,8 +3,8 @@ let PROTOCOLS = {
   'browser_protocol.json':  './browser_protocol.json',
   'js_protocol.json':  './js_protocol.json',
  * */
-  'browser_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/browser_protocol.json',
-  'js_protocol.json':  'https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json',
+  'browser_protocol.json':  'https://cdn.rawgit.com/ChromeDevTools/devtools-protocol/master/json/browser_protocol.json',
+  'js_protocol.json':  'https://cdn.rawgit.com/ChromeDevTools/devtools-protocol/master/json/js_protocol.json',
 };
 
 document.addEventListener('DOMContentLoaded', () => {
