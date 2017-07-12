@@ -61,15 +61,22 @@ code {
 }
 
 #search .home {
-  opacity: 0.5;
   padding: 10px;
 }
 
-#search .home:hover {
+#search .github {
+  transform: scale(0.85);
+}
+
+#search .toolbar-button {
+  opacity: 0.5;
+}
+
+#search .toolbar-button:hover {
   opacity: 0.85;
 }
 
-#search .home:active {
+#search .toolbar-button:active {
   opacity: 1;
 }
 
