@@ -271,7 +271,7 @@ function renderSearchResult(searchResult) {
  */
 function renderTextWithMatches(text, matches, fromIndex, toIndex) {
   if (!matches.length)
-    return E.textNode(text);
+    return E.textNode(text.substring(fromIndex, toIndex));
   let result = document.createDocumentFragment();
   let insideMatch = false;
   let currentIndex = fromIndex;
