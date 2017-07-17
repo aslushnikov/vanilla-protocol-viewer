@@ -143,7 +143,12 @@ class ProtocolRenderer {
       let container = main.vbox('parameter-value');
       container.appendChild(this.renderTypeLink(domain, parameter));
       let description = container.span('parameter-description');
-      description.innerHTML = parameter.description || '';
+      let descriptions = [];
+      if (parameter.description)
+        descriptions.push(parameter.description);
+      if (parameter.enum)
+        descriptions.push('Allowed values: ' + parameter.enum.map(value => '<code>' + value + '</code>').join(', ') + '.');
+      description.innerHTML = descriptions.join(' ');
       if (parameter.experimental)
         description.appendChild(this.experimentalMark());
     }
