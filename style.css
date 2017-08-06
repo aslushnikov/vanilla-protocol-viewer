@@ -288,6 +288,11 @@ span.experimental {
   background-color: var(--hover-color);
 }
 
+#sresults .search-item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 #sresults .search-item-icon {
   display: flex;
   align-items: center;
@@ -317,6 +322,7 @@ span.experimental {
 #sresults .search-item-main {
   flex: 1 1 auto;
   max-width: 1000px;
+  overflow: hidden;
 }
 
 #sresults .search-item-description {
