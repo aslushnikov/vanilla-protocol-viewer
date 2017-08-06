@@ -4,6 +4,26 @@
   --hover-color: rgba(225, 245, 254, 0.49);
 }
 
+@media only screen and (max-device-width : 800px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+
+  #sidebar {
+    display: none;
+  }
+
+  #content .domain {
+    padding: 2px;
+  }
+}
+
+@media only screen and (max-device-width : 400px) {
+  #search input {
+    width: 250px !important;
+  }
+}
+
 body {
   color: #333;
   background-color: #fafafa;
@@ -99,6 +119,7 @@ code {
   font-size: 20px;
   color: white;
   width: 450px;
+  text-overflow: ellipsis;
 }
 
 #sresults {
