@@ -132,6 +132,7 @@ code {
   right: 0;
   overflow-y: scroll;
   border-top: 2px solid rgba(51, 51, 51, 0.52);
+  -webkit-overflow-scrolling: touch;
 }
 
 #content {
@@ -142,6 +143,7 @@ code {
   bottom: 0;
   right: 0;
   overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
 }
 
 .boundary {
