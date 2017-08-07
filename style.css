@@ -2,13 +2,13 @@
   --sidebar-width: 150px;
   --search-height: 50px;
   --hover-color: rgba(225, 245, 254, 0.49);
-  --parameters-column-width: 250px;
+  --parameters-grid-template-columns: minmax(250px, max-content) auto;
 }
 
-@media only screen and (max-device-width : 800px) {
+@media only screen and (max-width : 800px) {
   :root {
     --sidebar-width: 0px;
-    --parameters-column-width: 1fr;
+    --parameters-grid-template-columns: max-content auto;
   }
 
   #sidebar {
@@ -20,7 +20,7 @@
   }
 }
 
-@media only screen and (max-device-width : 400px) {
+@media only screen and (max-width : 400px) {
   #search input {
     width: 250px !important;
   }
@@ -193,7 +193,7 @@ code {
 .parameter-list {
   padding: 0.5rem 5px;
   display: grid;
-  grid-template-columns: var(--parameters-column-width) 2fr;
+  grid-template-columns: var(--parameters-grid-template-columns);
   grid-gap: 10px 20px;
 }
 
