@@ -91,7 +91,7 @@ class ProtocolRenderer {
 
   renderTitle(domainName, title) {
     // Render heading.
-    let heading = E.el('h4', 'monospace');
+    let heading = E.el('h4', 'monospace text-overflow');
     let id = `${domainName}.${title}`;
     heading.setAttribute('id', ProtocolRenderer.titleId(domainName, title));
     heading.text(domainName + '.', 'method-domain');

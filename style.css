@@ -154,6 +154,11 @@ code {
   font-family: Consolas, Menlo, monospace;
 }
 
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .box {
   width: calc(98% - 46px);
   border-radius: 2px;
