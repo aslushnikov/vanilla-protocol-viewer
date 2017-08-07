@@ -130,7 +130,7 @@ class ProtocolRenderer {
   }
 
   renderParameter(domain, parameter) {
-    let main = E.hbox('parameter');
+    let main = document.createDocumentFragment();
     {
       // Render parameter name.
       let name = main.div('parameter-name monospace');
