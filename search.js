@@ -34,6 +34,12 @@ class Search {
       if (event.keyCode === 8 || event.keyCode === 46)
         this._searchInput.focus();
     });
+    // Activate on paste
+    document.addEventListener('paste', event => {
+      if (this._searchInput === document.activeElement)
+        return;
+      this._searchInput.focus();
+    });
     document.addEventListener('click', event => {
       if (this._searchInput.contains(event.target))
         return;
