@@ -4,7 +4,7 @@ class ProtocolRenderer {
   }
 
   renderDomain(domain) {
-    let result = document.createDocumentFragment();
+    let result = E.div();
     let main = result.div('domain');
     let padding = result.div('domain-padding', '\u2606');
     {
