@@ -4,7 +4,9 @@ class ProtocolRenderer {
   }
 
   renderDomain(domain) {
-    let main = E.div('domain');
+    let result = document.createDocumentFragment();
+    let main = result.div('domain');
+    let padding = result.div('domain-padding', '\u2606');
     {
       // Render domain main description.
       let container = main.div('box');
@@ -57,7 +59,7 @@ class ProtocolRenderer {
       }
     }
 
-    return main;
+    return result;
   }
 
   renderDomainType(domain, type) {

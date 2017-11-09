@@ -186,6 +186,15 @@ code {
   padding: 20px 48px 20px 48px;
 }
 
+.domain-padding {
+  height: 75vw;
+  display: flex;
+  font-size:100px;
+  align-items: center;
+  color: #4052b4;
+  justify-content: center;
+}
+
 .method-domain {
   color: #ababab;
 }
