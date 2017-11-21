@@ -6,18 +6,19 @@ class ProtocolRenderer {
   renderDomain(domain) {
     let result = E.div();
     let main = result.div('domain');
+    this.applyBackground(domain, main);
     let padding = result.div('domain-padding', '\u2606');
     {
       // Render domain main description.
       let container = main.div('box');
+      let header = container.div('box-content');
 
-      let title = container.el('h2');
+      let title = header.el('h2');
       title.textContent = domain.domain;
 
-      let description = container.el('p');
+      let description = header.el('p');
       description.innerHTML = domain.description || '';
-      if (domain.experimental)
-        description.appendChild(this.experimentalMark());
+      this.applyMarks(domain, title);
     }
 
     if (domain.commands && domain.commands.length) {
@@ -52,13 +53,12 @@ class ProtocolRenderer {
 
   renderDomainType(domain, type) {
     let main = E.div('type');
-    main.appendChild(this.renderTitle(domain.domain, type.id));
+    this.applyBackground(type, main);
+    main.appendChild(this.renderTitle(domain.domain, type.id, type));
     {
       // Render description.
       let p = main.el('p');
-      p.textContent = type.description || '';
-      if (type.experimental)
-        p.appendChild(this.experimentalMark());
+      p.innerHTML = type.description || '';
     }
     if (type.properties && type.properties.length) {
       // Render parameters.
@@ -79,26 +79,26 @@ class ProtocolRenderer {
     return main;
   }
 
-  renderTitle(domainName, title) {
+  renderTitle(domainName, title, item) {
     // Render heading.
     let heading = E.el('h4', 'monospace text-overflow');
     let id = `${domainName}.${title}`;
     heading.setAttribute('id', ProtocolRenderer.titleId(domainName, title));
     heading.text(domainName + '.', 'method-domain');
     heading.text(title, 'method-name');
+    this.applyMarks(item, heading);
     heading.a('#' + id, '#').classList.add('title-link');
     return heading;
   }
 
   renderEventOrMethod(domain, method) {
     let main = E.div('method');
-    main.appendChild(this.renderTitle(domain.domain, method.name));
+    this.applyBackground(method, main);
+    main.appendChild(this.renderTitle(domain.domain, method.name, method));
     {
       // Render description.
       let p = main.el('p');
       p.innerHTML = method.description || '';
-      if (method.experimental)
-        p.appendChild(this.experimentalMark());
     }
     if (method.parameters && method.parameters.length) {
       // Render parameters.
@@ -124,6 +124,7 @@ class ProtocolRenderer {
     {
       // Render parameter name.
       let name = main.div('parameter-name monospace');
+      this.applyBackground(parameter, name);
       if (parameter.optional)
         name.classList.add('optional');
       name.textContent = parameter.name;
@@ -131,6 +132,7 @@ class ProtocolRenderer {
     {
       // Render parameter value.
       let container = main.vbox('parameter-value');
+      this.applyBackground(parameter, container);
       container.appendChild(this.renderTypeLink(domain, parameter));
       let description = container.span('parameter-description');
       let descriptions = [];
@@ -139,8 +141,7 @@ class ProtocolRenderer {
       if (parameter.enum)
         descriptions.push('Allowed values: ' + parameter.enum.map(value => '<code>' + value + '</code>').join(', ') + '.');
       description.innerHTML = descriptions.join(' ');
-      if (parameter.experimental)
-        description.appendChild(this.experimentalMark());
+      this.applyMarks(parameter, description);
     }
     return main;
   }
@@ -176,10 +177,23 @@ class ProtocolRenderer {
     return E.el('span', 'parameter-type', '<TYPE>');
   }
 
-  experimentalMark() {
-    let e = E.el('span', 'experimental', 'experimental');
-    e.title = 'This may be changed, moved or removed';
-    return e;
+  applyBackground(item, element) {
+    if (item.experimental)
+      element.classList.add('experimental-bg');
+    else if (item.deprecated)
+      element.classList.add('deprecated-bg');
+  }
+
+  applyMarks(item, element) {
+    if (item.experimental) {
+      let e = element.span('experimental', 'experimental');
+      e.title = 'This may be changed, moved or removed';
+      element.appendChild(e);
+    } else if (item.deprecated) {
+      let e = element.span('deprecated', 'deprecated');
+      e.title = 'Deprecated, will be removed';
+      element.appendChild(e);
+    }
   }
 };
 
