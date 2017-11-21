@@ -24,6 +24,10 @@ class App {
     this._contentElement = contentElement;
     /** @type {!Map<string, !Object>} */
     this._domains = new Map();
+    /** @type {!Map<string, !Object>} */
+    this._allDomains = new Map();
+    /** @type {!Map<string, !Object>} */
+    this._stableDomains = new Map();
     this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
     this._protocolRenderer = new ProtocolRenderer();
     this._router = new Router(route => this._renderError);
@@ -49,17 +53,52 @@ class App {
     this._router.navigate(route);
   }
 
+  /**
+   * @param {*} object
+   */
+  static _stabilize(object) {
+    if (typeof object !== 'object')
+      return object;
+
+    const result = {};
+    for (var key in object) {
+      var value = object[key];
+      if (value instanceof Array)
+        result[key] = value.filter(item => item.experimental !== true).map(App._stabilize);
+      else
+        result[key] = App._stabilize(value);
+    }
+    return result;
+  }
+
   async _initialize() {
     let protocols = await Promise.all(Object.values(PROTOCOLS).map(url => fetch(url).then(r => r.json())));
 
-    this._domains.clear();
+    this._allDomains.clear();
+    this._stableDomains.clear();
+
     for (let protocol of protocols) {
-      for (let domain of protocol.domains)
-        this._domains.set(domain.domain, domain);
+      for (let domain of protocol.domains) {
+        this._allDomains.set(domain.domain, domain);
+        if (!domain.experimental)
+          this._stableDomains.set(domain.domain, App._stabilize(domain));
+      }
     }
+
+    document.body.classList.toggle('experimental-enabled', window.localStorage['experimental'] !== 'false');
+    document.getElementById('experimental').addEventListener('click', () => {
+      window.localStorage['experimental'] = window.localStorage['experimental'] === 'false' ? 'true' : 'false';
+      document.body.classList.toggle('experimental-enabled', window.localStorage['experimental'] !== 'false');
+      this._renderDomains();
+    });
+
+    this._renderDomains();
+  }
+
+  _renderDomains() {
+    this._domains = window.localStorage['experimental'] === 'false' ? this._stableDomains : this._allDomains;
     this._search.setDomains(Array.from(this._domains.values()));
     renderSidebar(Array.from(this._domains.keys()));
-
     this._router.navigate(this._router.route());
   }
 
@@ -67,22 +106,24 @@ class App {
     document.title = route;
     this._search.setDefaultValue(route);
     this._search.cancelSearch();
-    this._contentElement.innerHTML = '';
+    this._contentElement.textContent = '';
     var active = this._sidebarElement.querySelector('.active-link');
     if (active)
       active.classList.remove('active-link');
     if (!this._domains.has(domain)) {
-      this._contentElement.appendChild(renderError('Unknown domain: ' + domain));
+      this._contentElement.appendChild(renderError(`Unknown domain: ${domain}. Enable experimental domains above?`));
       return;
     }
     let link = this._sidebarElement.querySelector(`[href='#${domain}']`);
     if (link)
       link.classList.add('active-link');
     let render = this._protocolRenderer.renderDomain(this._domains.get(domain));
-    this._contentElement.appendChild(render);
-    let elem = render.querySelector('#' + ProtocolRenderer.titleId(domain, method));
-    if (elem)
-      elem.scrollIntoView();
+    if (render) {
+      this._contentElement.appendChild(render);
+      let elem = render.querySelector('#' + ProtocolRenderer.titleId(domain, method));
+      if (elem)
+        elem.scrollIntoView();
+    }
     else if (!method)
       this._contentElement.scrollTop = 0;
     this._contentElement.focus();
@@ -151,6 +192,7 @@ class Router {
 function renderSidebar(domainNames) {
   domainNames.sort();
   let sidebar = document.getElementById('sidebar');
+  sidebar.textContent = '';
   for (let name of domainNames) {
     let a = sidebar.a('#' + name, name);
     a.classList.add('domain-link');
