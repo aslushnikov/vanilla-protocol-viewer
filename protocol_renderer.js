@@ -25,12 +25,8 @@ class ProtocolRenderer {
       let title = main.el('h3');
       title.textContent = 'Methods';
       let container = main.box('box');
-      for (let i = 0; i < domain.commands.length; ++i) {
-        if (i !== 0)
-          container.div('boundary');
-        let method = domain.commands[i];
+      for (let method of domain.commands)
         container.appendChild(this.renderEventOrMethod(domain, method));
-      }
     }
 
     if (domain.events && domain.events.length) {
@@ -38,12 +34,8 @@ class ProtocolRenderer {
       let title = main.el('h3');
       title.textContent = 'Events';
       let container = main.box('box');
-      for (let i = 0; i < domain.events.length; ++i) {
-        if (i !== 0)
-          container.div('boundary');
-        let event = domain.events[i];
+      for (let event of domain.events)
         container.appendChild(this.renderEventOrMethod(domain, event));
-      }
     }
 
     if (domain.types && domain.types.length) {
@@ -51,12 +43,8 @@ class ProtocolRenderer {
       let title = main.el('h3');
       title.textContent = 'Types';
       let container = main.box('box');
-      for (let i = 0; i < domain.types.length; ++i) {
-        if (i !== 0)
-          container.div('boundary');
-        let type = domain.types[i];
+      for (let type of domain.types)
         container.appendChild(this.renderDomainType(domain, type));
-      }
     }
 
     return result;
