@@ -53,6 +53,56 @@ class App {
     this._router.navigate(route);
   }
 
+  static _nameProperty(collectionName) {
+    switch (collectionName) {
+      case 'domains':
+        return 'domain';
+      case 'types':
+        return 'id';
+      case 'commands':
+      case 'events':
+      case 'parameters':
+      case 'returns':
+        return 'name';
+    }
+    return null;
+  }
+
+  /**
+   * @param {*} object
+   * @param {boolean} alreadyExperimental
+   */
+  static _normalize(object, alreadyExperimental) {
+    if (typeof object !== 'object')
+      return object;
+    const result = {};
+    if (alreadyExperimental && object.experimental)
+      delete object.experimental;
+    for (let key in object) {
+      let value = object[key];
+      if (value instanceof Array) {
+        result[key] = value.map(item => App._normalize(item, alreadyExperimental || object.experimental));
+        let property = App._nameProperty(key);
+        if (property !== null) {
+          result[key].sort((a, b) => {
+            if (a.experimental !== b.experimental)
+              return a.experimental ? 1 : -1;
+            if (a.deprecated !== b.deprecated)
+              return a.deprecated ? 1 : -1;
+            if (a.optional !== b.optional)
+              return a.optional ? 1 : -1;
+            if (!property)
+              return 0;
+            return a[property].localeCompare(b[property]);
+          });
+        }
+      } else {
+        result[key] = App._normalize(value, alreadyExperimental || object.experimental);
+      }
+    }
+    return result;
+  }
+
   /**
    * @param {*} object
    */
@@ -61,8 +111,8 @@ class App {
       return object;
 
     const result = {};
-    for (var key in object) {
-      var value = object[key];
+    for (let key in object) {
+      let value = object[key];
       if (value instanceof Array)
         result[key] = value.filter(item => item.experimental !== true).map(App._stabilize);
       else
@@ -77,12 +127,11 @@ class App {
     this._allDomains.clear();
     this._stableDomains.clear();
 
-    for (let protocol of protocols) {
-      for (let domain of protocol.domains) {
-        this._allDomains.set(domain.domain, domain);
-        if (!domain.experimental)
-          this._stableDomains.set(domain.domain, App._stabilize(domain));
-      }
+    let protocol = App._normalize({domains: [].concat(...protocols.map(p => p.domains))});
+    for (let domain of protocol.domains) {
+      this._allDomains.set(domain.domain, domain);
+      if (!domain.experimental)
+        this._stableDomains.set(domain.domain, App._stabilize(domain));
     }
 
     document.body.classList.toggle('experimental-enabled', window.localStorage['experimental'] !== 'false');
@@ -98,7 +147,7 @@ class App {
   _renderDomains() {
     this._domains = window.localStorage['experimental'] === 'false' ? this._stableDomains : this._allDomains;
     this._search.setDomains(Array.from(this._domains.values()));
-    renderSidebar(Array.from(this._domains.keys()));
+    this._renderSidebar(this._domains);
     this._router.navigate(this._router.route());
   }
 
@@ -137,6 +186,17 @@ class App {
     var template = document.querySelector('#landing');
     var clone = document.importNode(template.content, true);
     this._contentElement.appendChild(clone);
+  }
+
+  _renderSidebar(domains) {
+    let domainNames = Array.from(domains.keys());
+    let sidebar = document.getElementById('sidebar');
+    sidebar.textContent = '';
+    for (let name of domainNames) {
+      let a = sidebar.a('#' + name, name);
+      a.classList.add('domain-link');
+      this._protocolRenderer.applyBackground(domains.get(name), a);
+    }
   }
 }
 
@@ -188,20 +248,10 @@ class Router {
   }
 }
 
-
-function renderSidebar(domainNames) {
-  domainNames.sort();
-  let sidebar = document.getElementById('sidebar');
-  sidebar.textContent = '';
-  for (let name of domainNames) {
-    let a = sidebar.a('#' + name, name);
-    a.classList.add('domain-link');
-  }
-}
-
 function renderError(error) {
   let main = E.box();
-  main.el('h2', '', 'Error');
-  main.p('', error);
+  let box = main.div('box-content');
+  box.el('h2', '', 'Error');
+  box.p('', error);
   return main;
 }
