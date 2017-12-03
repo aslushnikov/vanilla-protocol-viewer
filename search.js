@@ -241,15 +241,15 @@ function renderSearchResult(searchResult) {
     // Render icon
     let icon = main.span('search-item-icon');
     if (item.type === Search.ItemType.Method) {
-      icon.textContent = 'M';
+      icon.textContent = 'Method';
       icon.title = 'Method';
       icon.classList.add('icon-method');
     } else if (item.type === Search.ItemType.Type) {
-      icon.textContent = 'T';
+      icon.textContent = 'Type';
       icon.title = 'Type';
       icon.classList.add('icon-type');
     } else if (item.type === Search.ItemType.Event) {
-      icon.textContent = 'E';
+      icon.textContent = 'Event';
       icon.title = 'Event';
       icon.classList.add('icon-event');
     }

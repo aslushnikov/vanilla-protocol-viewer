@@ -362,10 +362,11 @@ span.deprecated {
   justify-content: center;
   flex-shrink: 0;
   flex-grow: 0;
-  width: 20px;
+  width: 49px;
+  font-size: 12px;
   height: 20px;
   color: white;
-  margin: 10px 30px;
+  margin: 10px 15px;
   border-radius: 3px;
   cursor: help;
 }
