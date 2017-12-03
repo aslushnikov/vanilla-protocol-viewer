@@ -87,8 +87,11 @@ class ProtocolRenderer {
         const referenceIcon = li.span('reference-icon');
         if (reference.type === 'command')
           referenceIcon.appendChild(ProtocolRenderer.renderMethodIcon());
-        else
+        else if (reference.type === 'event')
           referenceIcon.appendChild(ProtocolRenderer.renderEventIcon());
+        else if (reference.type === 'type')
+          referenceIcon.appendChild(ProtocolRenderer.renderTypeIcon());
+
         li.appendChild(ProtocolRenderer.renderRef(reference.name));
       }
     }

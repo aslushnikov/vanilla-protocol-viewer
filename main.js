@@ -151,6 +151,20 @@ class App {
           });
         }
       }
+      for (let type of domain.types) {
+        if (!type.properties)
+          continue;
+        for (let arg of type.properties) {
+          const typeId = getReferencedType(domain.domain, arg);
+          const type = typeidToType.get(typeId);
+          if (!type)
+            continue;
+          type.referencedBy.push({
+            type: 'type', 
+            name: domain.domain + '.' + type.id
+          });
+        }
+      }
     }
     for (let type of typeidToType.values())
       type.referencedBy.sort((a, b) => a.name.localeCompare(b.name));
