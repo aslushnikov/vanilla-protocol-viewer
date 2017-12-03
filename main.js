@@ -168,6 +168,8 @@ class App {
       let elem = render.querySelector('#' + ProtocolRenderer.titleId(domain, method));
       if (elem)
         elem.scrollIntoView();
+      else
+        this._contentElement.scrollTop = 0;
     }
     else if (!method)
       this._contentElement.scrollTop = 0;
