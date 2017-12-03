@@ -224,7 +224,6 @@ input[type=search] {
   padding: 0.5rem 5px;
   display: grid;
   grid-template-columns: var(--parameters-grid-template-columns);
-  grid-gap: 10px 20px;
 }
 
 .parameter {
@@ -237,6 +236,7 @@ input[type=search] {
   text-align: right;
   color: black;
   word-wrap: break-word;
+  padding: 5px 10px;
 }
 
 .parameter-highlight {
@@ -244,6 +244,7 @@ input[type=search] {
 
 .parameter-value {
   overflow: hidden;
+  padding: 5px 10px;
 }
 
 .parameter-type {
@@ -255,10 +256,6 @@ input[type=search] {
 
 .parameter-description {
   font-size: 90%;
-}
-
-.optional {
-  opacity: .9;
 }
 
 .optional::after {
@@ -296,11 +293,11 @@ span.deprecated {
 }
 
 #content .experimental-bg {
-  background-color: #ffd4d4;
+  background-color: rgba(255, 212, 212, 0.3);
 }
 
 #content .deprecated-bg {
-  background-color: #fff9bb;
+  background-color: rgba(255, 249, 187, 0.3);
 }
 
 #sidebar .domain-link.experimental-bg {
@@ -308,7 +305,7 @@ span.deprecated {
 }
 
 #sidebar .domain-link.deprecated-bg {
-  border-color: #fff9bb;
+  border-color: hsla(55, 100%, 81%, 1);
 }
 
 #sidebar .domain-link {
@@ -328,7 +325,9 @@ span.deprecated {
 }
 
 #sidebar .active-link {
-  border-left: 10px solid #3f51b5 !important;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: rgb(225, 245, 254);
 }
 
 #sidebar .domain-link:hover {
