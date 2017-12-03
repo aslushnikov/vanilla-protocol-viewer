@@ -156,18 +156,24 @@ class App {
           continue;
         for (let arg of type.properties) {
           const typeId = getReferencedType(domain.domain, arg);
-          const type = typeidToType.get(typeId);
-          if (!type)
+          const referencedType = typeidToType.get(typeId);
+          if (!referencedType)
             continue;
-          type.referencedBy.push({
+          referencedType.referencedBy.push({
             type: 'type', 
             name: domain.domain + '.' + type.id
           });
         }
       }
     }
-    for (let type of typeidToType.values())
+    for (let type of typeidToType.values()) {
+      // Dedupe and sort backreferences
+      let map = new Map();
+      for (let reference of type.referencedBy)
+        map.set(reference.name, reference);
+      type.referencedBy = Array.from(map.values());
       type.referencedBy.sort((a, b) => a.name.localeCompare(b.name));
+    }
 
     return protocol;
 
