@@ -294,11 +294,11 @@ span.deprecated {
 }
 
 #content .experimental-bg {
-  background-color: rgba(255, 212, 212, 0.3);
+  background-color: rgba(255, 212, 212, 0.2);
 }
 
 #content .deprecated-bg {
-  background-color: rgba(255, 249, 187, 0.3);
+  background-color: rgba(255, 249, 187, 0.2);
 }
 
 #sidebar .domain-link.experimental-bg {

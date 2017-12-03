@@ -54,6 +54,7 @@ class ProtocolRenderer {
   renderDomainType(domain, type) {
     let main = E.div('type');
     this.applyBackground(type, main);
+    this.applyBackground(domain, main);
     main.appendChild(this.renderTitle(domain.domain, type.id, type));
     {
       // Render description.
@@ -94,6 +95,7 @@ class ProtocolRenderer {
   renderEventOrMethod(domain, method) {
     let main = E.div('method');
     this.applyBackground(method, main);
+    this.applyBackground(domain, main);
     main.appendChild(this.renderTitle(domain.domain, method.name, method));
     {
       // Render description.
