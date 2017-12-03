@@ -25,7 +25,6 @@ class App {
     /** @type {!Map<string, !Object>} */
     this._stableDomains = new Map();
     this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
-    this._protocolRenderer = new ProtocolRenderer();
     this._router = new Router(route => this._renderError);
     this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, (route, domain, method) => this._onNavigateDomain(route, domain, method));
     this._router.setRoute(/^$/, this._onNavigateHome.bind(this));
@@ -162,7 +161,7 @@ class App {
     let link = this._sidebarElement.querySelector(`[href='#${domain}']`);
     if (link)
       link.classList.add('active-link');
-    let render = this._protocolRenderer.renderDomain(this._domains.get(domain));
+    let render = ProtocolRenderer.renderDomain(this._domains.get(domain));
     if (render) {
       this._contentElement.appendChild(render);
       let elem = render.querySelector('#' + ProtocolRenderer.titleId(domain, method));
@@ -193,7 +192,7 @@ class App {
     for (let name of domainNames) {
       let a = sidebar.a('#' + name, name);
       a.classList.add('domain-link');
-      this._protocolRenderer.applyBackground(domains.get(name), a);
+      ProtocolRenderer.applyBackground(domains.get(name), a);
     }
   }
 }

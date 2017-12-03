@@ -3,10 +3,10 @@ class ProtocolRenderer {
     return domainName + '_' + domainEntry;
   }
 
-  renderDomain(domain) {
+  static renderDomain(domain) {
     let result = E.div();
     let main = result.div('domain');
-    this.applyBackground(domain, main);
+    ProtocolRenderer.applyBackground(domain, main);
     let padding = result.div('domain-padding', '\u2606');
     {
       // Render domain main description.
@@ -18,7 +18,7 @@ class ProtocolRenderer {
 
       let description = header.el('p');
       description.innerHTML = domain.description || '';
-      this.applyMarks(domain, title);
+      ProtocolRenderer.applyMarks(domain, title);
     }
 
     if (domain.commands && domain.commands.length) {
@@ -27,7 +27,7 @@ class ProtocolRenderer {
       title.textContent = 'Methods';
       let container = main.box('box');
       for (let method of domain.commands)
-        container.appendChild(this.renderEventOrMethod(domain, method));
+        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, method));
     }
 
     if (domain.events && domain.events.length) {
@@ -36,7 +36,7 @@ class ProtocolRenderer {
       title.textContent = 'Events';
       let container = main.box('box');
       for (let event of domain.events)
-        container.appendChild(this.renderEventOrMethod(domain, event));
+        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, event));
     }
 
     if (domain.types && domain.types.length) {
@@ -45,17 +45,17 @@ class ProtocolRenderer {
       title.textContent = 'Types';
       let container = main.box('box');
       for (let type of domain.types)
-        container.appendChild(this.renderDomainType(domain, type));
+        container.appendChild(ProtocolRenderer.renderDomainType(domain, type));
     }
 
     return result;
   }
 
-  renderDomainType(domain, type) {
+  static renderDomainType(domain, type) {
     let main = E.div('type');
-    this.applyBackground(type, main);
-    this.applyBackground(domain, main);
-    main.appendChild(this.renderTitle(domain.domain, type.id, type));
+    ProtocolRenderer.applyBackground(type, main);
+    ProtocolRenderer.applyBackground(domain, main);
+    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, type.id, type));
     {
       // Render description.
       let p = main.el('p');
@@ -67,7 +67,7 @@ class ProtocolRenderer {
       title.textContent = 'Properties';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of type.properties)
-        container.appendChild(this.renderParameter(domain, parameter));
+        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
     if (type.type) {
       main.el('p', '', 'Type: ')
@@ -80,23 +80,23 @@ class ProtocolRenderer {
     return main;
   }
 
-  renderTitle(domainName, title, item) {
+  static renderTitle(domainName, title, item) {
     // Render heading.
     let heading = E.el('h4', 'monospace text-overflow');
     let id = `${domainName}.${title}`;
     heading.setAttribute('id', ProtocolRenderer.titleId(domainName, title));
     heading.text(domainName + '.', 'method-domain');
     heading.text(title, 'method-name');
-    this.applyMarks(item, heading);
+    ProtocolRenderer.applyMarks(item, heading);
     heading.a('#' + id, '#').classList.add('title-link');
     return heading;
   }
 
-  renderEventOrMethod(domain, method) {
+  static renderEventOrMethod(domain, method) {
     let main = E.div('method');
-    this.applyBackground(method, main);
-    this.applyBackground(domain, main);
-    main.appendChild(this.renderTitle(domain.domain, method.name, method));
+    ProtocolRenderer.applyBackground(method, main);
+    ProtocolRenderer.applyBackground(domain, main);
+    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, method.name, method));
     {
       // Render description.
       let p = main.el('p');
@@ -108,7 +108,7 @@ class ProtocolRenderer {
       title.textContent = 'Parameters';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of method.parameters)
-        container.appendChild(this.renderParameter(domain, parameter));
+        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
     if (method.returns && method.returns.length) {
       // Render return values.
@@ -116,17 +116,17 @@ class ProtocolRenderer {
       title.textContent = 'RETURN OBJECT';
       let container = main.el('dl', 'parameter-list');
       for (let parameter of method.returns)
-        container.appendChild(this.renderParameter(domain, parameter));
+        container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
     return main;
   }
 
-  renderParameter(domain, parameter) {
+  static renderParameter(domain, parameter) {
     let main = document.createDocumentFragment();
     {
       // Render parameter name.
       let name = main.div('parameter-name monospace');
-      this.applyBackground(parameter, name);
+      ProtocolRenderer.applyBackground(parameter, name);
       if (parameter.optional)
         name.classList.add('optional');
       name.textContent = parameter.name;
@@ -134,8 +134,8 @@ class ProtocolRenderer {
     {
       // Render parameter value.
       let container = main.vbox('parameter-value');
-      this.applyBackground(parameter, container);
-      container.appendChild(this.renderTypeLink(domain, parameter));
+      ProtocolRenderer.applyBackground(parameter, container);
+      container.appendChild(ProtocolRenderer.renderTypeLink(domain, parameter));
       let description = container.span('parameter-description');
       let descriptions = [];
       if (parameter.description)
@@ -143,12 +143,12 @@ class ProtocolRenderer {
       if (parameter.enum)
         descriptions.push('Allowed values: ' + parameter.enum.map(value => '<code>' + value + '</code>').join(', ') + '.');
       description.innerHTML = descriptions.join(' ');
-      this.applyMarks(parameter, description);
+      ProtocolRenderer.applyMarks(parameter, description);
     }
     return main;
   }
 
-  renderTypeLink(domain, parameter) {
+  static renderTypeLink(domain, parameter) {
     const primitiveTypes = new Set([
       "string",
       "integer",
@@ -172,21 +172,21 @@ class ProtocolRenderer {
     if (parameter.type === 'array') {
       let generic = E.span('parameter-type');
       generic.text('array [ ');
-      generic.appendChild(this.renderTypeLink(domain, parameter.items));
+      generic.appendChild(ProtocolRenderer.renderTypeLink(domain, parameter.items));
       generic.text(' ]');
       return generic;
     }
     return E.el('span', 'parameter-type', '<TYPE>');
   }
 
-  applyBackground(item, element) {
+  static applyBackground(item, element) {
     if (item.experimental)
       element.classList.add('experimental-bg');
     else if (item.deprecated)
       element.classList.add('deprecated-bg');
   }
 
-  applyMarks(item, element) {
+  static applyMarks(item, element) {
     if (item.experimental) {
       let e = element.span('experimental', 'experimental');
       e.title = 'This may be changed, moved or removed';
