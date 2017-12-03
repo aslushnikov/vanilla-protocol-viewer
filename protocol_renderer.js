@@ -21,7 +21,7 @@ class ProtocolRenderer {
       ProtocolRenderer.applyMarks(domain, title);
     }
 
-    if (domain.commands && domain.commands.length) {
+    if (domain.commands.length) {
       // Render methods.
       let title = main.el('h3');
       title.textContent = 'Methods';
@@ -30,7 +30,7 @@ class ProtocolRenderer {
         container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, method, false));
     }
 
-    if (domain.events && domain.events.length) {
+    if (domain.events.length) {
       // Render events.
       let title = main.el('h3');
       title.textContent = 'Events';
@@ -39,7 +39,7 @@ class ProtocolRenderer {
         container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, event, true));
     }
 
-    if (domain.types && domain.types.length) {
+    if (domain.types.length) {
       // Render events.
       let title = main.el('h3');
       title.textContent = 'Types';
@@ -56,6 +56,10 @@ class ProtocolRenderer {
     ProtocolRenderer.applyBackground(type, main);
     ProtocolRenderer.applyBackground(domain, main);
     main.appendChild(ProtocolRenderer.renderTitle(domain.domain, type.id, type, 'type'));
+    if (type.type) {
+      main.el('p', '', 'Type: ')
+        .text(type.type, 'parameter-type');
+    }
     {
       // Render description.
       let p = main.el('p');
@@ -69,14 +73,26 @@ class ProtocolRenderer {
       for (let parameter of type.properties)
         container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
-    if (type.type) {
-      main.el('p', '', 'Type: ')
-        .text(type.type, 'parameter-type');
-    }
     if (type.enum) {
       main.el('h5', '', 'Allowed values');
       main.el('p', '', type.enum.join(', '));
     }
+    if (type.referencedBy && type.referencedBy.length) {
+      // Render back references.
+      let title = main.el('h5');
+      title.textContent = 'Referenced By';
+      let container = main.el('ul', 'references-list');
+      for (let reference of type.referencedBy) {
+        const li = container.el('li');
+        const referenceIcon = li.span('reference-icon');
+        if (reference.type === 'command')
+          referenceIcon.appendChild(ProtocolRenderer.renderMethodIcon());
+        else
+          referenceIcon.appendChild(ProtocolRenderer.renderEventIcon());
+        li.appendChild(ProtocolRenderer.renderRef(reference.name));
+      }
+    }
+
     return main;
   }
 
@@ -110,7 +126,7 @@ class ProtocolRenderer {
       let p = main.el('p');
       p.innerHTML = method.description || '';
     }
-    if (method.parameters && method.parameters.length) {
+    if (method.parameters.length) {
       // Render parameters.
       let title = main.el('h5');
       title.textContent = 'Parameters';
@@ -118,7 +134,7 @@ class ProtocolRenderer {
       for (let parameter of method.parameters)
         container.appendChild(ProtocolRenderer.renderParameter(domain, parameter));
     }
-    if (method.returns && method.returns.length) {
+    if (method.returns.length) {
       // Render return values.
       let title = main.el('h5');
       title.textContent = 'RETURN OBJECT';
@@ -169,13 +185,10 @@ class ProtocolRenderer {
     if (primitiveTypes.has(parameter.type))
       return E.span('parameter-type', parameter.type);
     if (parameter.$ref) {
-      let a = E.el('a', 'parameter-type');
-      if (parameter.$ref.includes('.'))
-        a.href = '#' + parameter.$ref;
-      else
-        a.href = '#' + domain.domain + '.' + parameter.$ref;
-      a.textContent = parameter.$ref;
-      return a;
+      let $ref = parameter.$ref;
+      if (!$ref.includes('.'))
+        $ref = domain.domain + '.' + parameter.$ref;
+      return ProtocolRenderer.renderRef($ref);
     }
     if (parameter.type === 'array') {
       let generic = E.span('parameter-type');
@@ -185,6 +198,13 @@ class ProtocolRenderer {
       return generic;
     }
     return E.el('span', 'parameter-type', '<TYPE>');
+  }
+
+  static renderRef($ref) {
+    let a = E.el('a', 'parameter-type');
+    a.href = '#' + $ref;
+    a.textContent = $ref;
+    return a;
   }
 
   static applyBackground(item, element) {

@@ -369,8 +369,23 @@ span.deprecated {
   margin-right: 1ex;
 }
 
+.references-list {
+  list-style-type: none; 
+}
+
+.references-list .entity-icon {
+  padding: 1px 3px;
+}
+
+.reference-icon {
+  width: 55px;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: right;
+}
+
 .entity-icon {
-  vertical-align: bottom;
+  vertical-align: top;
   display: inline-block;
   padding: 3px 3px;
   font-size: 12px;

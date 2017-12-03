@@ -98,6 +98,74 @@ class App {
     return result;
   }
 
+  static _normalizeProtocol(protocol) {
+    protocol = App._normalize(protocol);
+    // Assign empty arrays to otherwise undefined fields.
+    for (let domain of protocol.domains) {
+      domain.commands = domain.commands || [];
+      domain.events = domain.events || [];      
+      domain.types = domain.types || [];
+      for (let event of domain.events) {
+        event.parameters = event.parameters || [];
+        event.returns = event.returns || [];
+      }
+      for (let command of domain.commands) {
+        command.parameters = command.parameters || [];
+        command.returns = command.returns || [];
+      }
+    }
+
+    // Compute back references.
+    const typeidToType = new Map();
+    for (let domain of protocol.domains) {
+      for (let type of domain.types) {
+        type.referencedBy = [];
+        typeidToType.set(domain.domain + '.' + type.id, type);
+      }
+    }
+
+    for (let domain of protocol.domains) {
+      for (let command of domain.commands) {
+        const args = command.parameters.concat(command.returns);
+        for (let arg of args) {
+          const typeId = getReferencedType(domain.domain, arg);
+          const type = typeidToType.get(typeId);
+          if (!type)
+            continue;
+          type.referencedBy.push({
+            type: 'command',
+            name: domain.domain + '.' + command.name
+          });
+        }
+      }
+      for (let event of domain.events) {
+        const args = event.parameters.concat(event.returns);
+        for (let arg of args) {
+          const typeId = getReferencedType(domain.domain, arg);
+          const type = typeidToType.get(typeId);
+          if (!type)
+            continue;
+          type.referencedBy.push({
+            type: 'event', 
+            name: domain.domain + '.' + event.name
+          });
+        }
+      }
+    }
+    for (let type of typeidToType.values())
+      type.referencedBy.sort((a, b) => a.name.localeCompare(b.name));
+
+    return protocol;
+
+    function getReferencedType(domainName, parameter) {
+      if (parameter.$ref)
+        return parameter.$ref.includes('.') ? parameter.$ref : domainName + '.' + parameter.$ref;
+      if (parameter.type === 'array')
+        return getReferencedType(domainName, parameter.items);
+      return null;
+    }
+  }
+
   /**
    * @param {*} object
    */
@@ -122,7 +190,8 @@ class App {
     this._allDomains.clear();
     this._stableDomains.clear();
 
-    let protocol = App._normalize({domains: [].concat(...protocols.map(p => p.domains))});
+    let protocol = App._normalizeProtocol({domains: [].concat(...protocols.map(p => p.domains))});
+
     for (let domain of protocol.domains) {
       this._allDomains.set(domain.domain, domain);
       if (!domain.experimental)
