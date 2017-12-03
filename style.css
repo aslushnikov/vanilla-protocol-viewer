@@ -18,6 +18,10 @@
   #content .domain {
     padding: 2px;
   }
+
+  .box {
+    width: 100% !important;
+  }
 }
 
 @media only screen and (max-width : 400px) {
