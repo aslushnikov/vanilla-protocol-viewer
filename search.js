@@ -237,22 +237,15 @@ class Search {
 function renderSearchResult(searchResult) {
   let item = searchResult.item;
   let main = E.hbox('search-item');
-  {
-    // Render icon
-    let icon = main.span('search-item-icon');
-    if (item.type === Search.ItemType.Method) {
-      icon.textContent = 'Method';
-      icon.title = 'Method';
-      icon.classList.add('icon-method');
-    } else if (item.type === Search.ItemType.Type) {
-      icon.textContent = 'Type';
-      icon.title = 'Type';
-      icon.classList.add('icon-type');
-    } else if (item.type === Search.ItemType.Event) {
-      icon.textContent = 'Event';
-      icon.title = 'Event';
-      icon.classList.add('icon-event');
-    }
+  let icon = main.el('span');
+  icon.classList.add('search-item-icon');
+  // Render icon
+  if (item.type === Search.ItemType.Method) {
+    icon.appendChild(ProtocolRenderer.renderMethodIcon());
+  } else if (item.type === Search.ItemType.Type) {
+    icon.appendChild(ProtocolRenderer.renderTypeIcon());
+  } else if (item.type === Search.ItemType.Event) {
+    icon.appendChild(ProtocolRenderer.renderEventIcon());
   }
   {
     // Render Name and Description

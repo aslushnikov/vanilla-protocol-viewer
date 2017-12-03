@@ -27,7 +27,7 @@ class ProtocolRenderer {
       title.textContent = 'Methods';
       let container = main.box('box');
       for (let method of domain.commands)
-        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, method));
+        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, method, false));
     }
 
     if (domain.events && domain.events.length) {
@@ -36,7 +36,7 @@ class ProtocolRenderer {
       title.textContent = 'Events';
       let container = main.box('box');
       for (let event of domain.events)
-        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, event));
+        container.appendChild(ProtocolRenderer.renderEventOrMethod(domain, event, true));
     }
 
     if (domain.types && domain.types.length) {
@@ -55,7 +55,7 @@ class ProtocolRenderer {
     let main = E.div('type');
     ProtocolRenderer.applyBackground(type, main);
     ProtocolRenderer.applyBackground(domain, main);
-    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, type.id, type));
+    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, type.id, type, 'type'));
     {
       // Render description.
       let p = main.el('p');
@@ -80,9 +80,17 @@ class ProtocolRenderer {
     return main;
   }
 
-  static renderTitle(domainName, title, item) {
+  static renderTitle(domainName, title, item, titleType) {
     // Render heading.
     let heading = E.el('h4', 'monospace text-overflow');
+
+    if (titleType === 'type')
+      heading.appendChild(ProtocolRenderer.renderTypeIcon());
+    else if (titleType === 'event')
+      heading.appendChild(ProtocolRenderer.renderEventIcon());
+    else if (titleType === 'method')
+      heading.appendChild(ProtocolRenderer.renderMethodIcon());
+
     let id = `${domainName}.${title}`;
     heading.setAttribute('id', ProtocolRenderer.titleId(domainName, title));
     heading.text(domainName + '.', 'method-domain');
@@ -92,11 +100,11 @@ class ProtocolRenderer {
     return heading;
   }
 
-  static renderEventOrMethod(domain, method) {
+  static renderEventOrMethod(domain, method, isEvent) {
     let main = E.div('method');
     ProtocolRenderer.applyBackground(method, main);
     ProtocolRenderer.applyBackground(domain, main);
-    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, method.name, method));
+    main.appendChild(ProtocolRenderer.renderTitle(domain.domain, method.name, method, isEvent ? 'event' : 'method'));
     {
       // Render description.
       let p = main.el('p');
@@ -196,6 +204,30 @@ class ProtocolRenderer {
       e.title = 'Deprecated, will be removed';
       element.appendChild(e);
     }
+  }
+
+  static renderMethodIcon() {
+    let icon = E.span('entity-icon');
+    icon.textContent = 'Method';
+    icon.title = 'Method';
+    icon.classList.add('entity-icon-method');
+    return icon;
+  }
+
+  static renderTypeIcon() {
+    let icon = E.span('entity-icon');
+    icon.textContent = 'Type';
+    icon.title = 'Type';
+    icon.classList.add('entity-icon-type');
+    return icon;
+  }
+
+  static renderEventIcon() {
+    let icon = E.span('entity-icon');
+    icon.textContent = 'Event';
+    icon.title = 'Event';
+    icon.classList.add('entity-icon-event');
+    return icon;
   }
 };
 

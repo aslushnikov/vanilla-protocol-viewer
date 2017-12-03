@@ -357,30 +357,38 @@ span.deprecated {
 }
 
 #sresults .search-item-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 10px 15px;
+  width: 50px;
+  text-align: center;
   flex-shrink: 0;
   flex-grow: 0;
-  width: 49px;
+}
+
+
+#content .entity-icon {
+  margin-right: 1ex;
+}
+
+.entity-icon {
+  vertical-align: bottom;
+  display: inline-block;
+  padding: 3px 3px;
   font-size: 12px;
-  height: 20px;
   color: white;
-  margin: 10px 15px;
   border-radius: 3px;
-  cursor: help;
+  user-select: none;
 }
 
-.icon-method {
-  background-color: orange;
+.entity-icon-method {
+  background-color: #ffa000b5;
 }
 
-.icon-type {
-  background-color: blue;
+.entity-icon-type {
+  background-color: #3f51b5b0;
 }
 
-.icon-event {
-  background-color: green;
+.entity-icon-event {
+  background-color: #2e7d32a8;
 }
 
 #sresults .search-item-main {
