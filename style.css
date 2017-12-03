@@ -18,10 +18,6 @@
   #content .domain {
     padding: 2px;
   }
-
-  .box {
-    width: 100% !important;
-  }
 }
 
 @media only screen and (max-width : 400px) {
@@ -185,7 +181,7 @@ input[type=search] {
 }
 
 .box {
-  width: calc(98% - 46px);
+  width: 98%;
   border-radius: 2px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
   margin: 16px auto 32px auto;
@@ -415,5 +411,5 @@ span.deprecated {
 }
 
 .method:not(:last-child), .type:not(:last-child) {
-  border-bottom: solid #B6B6B6 1px;
+  border-bottom: double #b6b6b6a6 3px;
 }
