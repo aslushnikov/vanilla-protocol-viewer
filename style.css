@@ -357,7 +357,7 @@ span.deprecated {
 }
 
 #sresults .search-item-icon {
-  margin: 10px 15px;
+  margin: 10px 18px 10px 8px;
   width: 50px;
   text-align: center;
   flex-shrink: 0;
@@ -382,6 +382,10 @@ span.deprecated {
   display: inline-block;
   vertical-align: middle;
   text-align: right;
+}
+
+#sresults .entity-icon {
+  width: 50px;
 }
 
 .entity-icon {
