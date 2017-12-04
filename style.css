@@ -53,6 +53,11 @@ h5 {
   margin: 1rem 0 0;
 }
 
+a {
+  font-weight: normal !important;
+  color: #333;
+}
+
 code {
   font-family: Consolas, Menlo, monospace;
   color: #9C27B0;
