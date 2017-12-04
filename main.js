@@ -114,17 +114,20 @@ class App {
         command.returns = command.returns || [];
       }
     }
+    return protocol;
+  }
 
+  static _computeBackReferences(domains) {
     // Compute back references.
     const typeidToType = new Map();
-    for (let domain of protocol.domains) {
+    for (let domain of domains) {
       for (let type of domain.types) {
         type.referencedBy = [];
         typeidToType.set(domain.domain + '.' + type.id, type);
       }
     }
 
-    for (let domain of protocol.domains) {
+    for (let domain of domains) {
       for (let command of domain.commands) {
         const args = command.parameters.concat(command.returns);
         for (let arg of args) {
@@ -175,8 +178,6 @@ class App {
       type.referencedBy.sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    return protocol;
-
     function getReferencedType(domainName, parameter) {
       if (parameter.$ref)
         return parameter.$ref.includes('.') ? parameter.$ref : domainName + '.' + parameter.$ref;
@@ -217,6 +218,8 @@ class App {
       if (!domain.experimental)
         this._stableDomains.set(domain.domain, App._stabilize(domain));
     }
+    App._computeBackReferences(Array.from(this._allDomains.values()));
+    App._computeBackReferences(Array.from(this._stableDomains.values()));
 
     document.body.classList.toggle('experimental-enabled', window.localStorage['experimental'] !== 'false');
     document.getElementById('experimental').addEventListener('click', () => {
