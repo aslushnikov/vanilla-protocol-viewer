@@ -25,7 +25,7 @@ class App {
     /** @type {!Map<string, !Object>} */
     this._stableDomains = new Map();
     this._search = new Search(document.getElementById('search'), document.getElementById('sresults'));
-    this._router = new Router(route => this._renderError);
+    this._router = new Router(route => this._contentElement.appendChild(renderError(`Route (${route}) not matched`)));
     this._router.setRoute(/^(\w+)(?:\.(\w+))?$/, (route, domain, method) => this._onNavigateDomain(route, domain, method));
     this._router.setRoute(/^$/, this._onNavigateHome.bind(this));
     this._initialize();
