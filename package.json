@@ -1,0 +1,13 @@
+{
+  "name": "vanilla-protocol-viewer",
+  "version": "0.0.1",
+  "license": "Apache-2",
+  "scripts": {
+    "build": "node scripts/ssr.js"
+  },
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "devtools-protocol": "^0.0.522775",
+    "usus": "^1.6.0"
+  }
+}
