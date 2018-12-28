@@ -293,6 +293,7 @@ span.experimental, span.deprecated {
   font-weight: normal;
   font-family: inherit;
   margin-left: 1ex;
+  user-select: none;
 }
 
 span.deprecated {
@@ -375,7 +376,7 @@ span.deprecated {
 }
 
 .references-list {
-  list-style-type: none; 
+  list-style-type: none;
 }
 
 .references-list .entity-icon {
