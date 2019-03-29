@@ -8,6 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let content = document.getElementById('content');
 
   window.app = new App(sidebar, content);
+
+  document.body.addEventListener('click', event => {
+    if (!(event.target.nodeName === 'A' && event.target.hostname === window.location.hostname))
+      return;
+    event.preventDefault();
+    window.app.navigate(event.target.search);
+  }, false);
+
 });
 
 class App {
@@ -250,7 +258,7 @@ class App {
       this._contentElement.appendChild(renderError(`Unknown domain: ${domain}. Enable experimental domains above?`));
       return;
     }
-    let link = this._sidebarElement.querySelector(`[href='#${domain}']`);
+    let link = this._sidebarElement.querySelector(`[href='?${domain}']`);
     if (link)
       link.classList.add('active-link');
     let render = ProtocolRenderer.renderDomain(this._domains.get(domain));
@@ -282,7 +290,7 @@ class App {
     let sidebar = document.getElementById('sidebar');
     sidebar.textContent = '';
     for (let name of domainNames) {
-      let a = sidebar.a('#' + name, name);
+      let a = sidebar.a('?' + name, name);
       a.classList.add('domain-link');
       ProtocolRenderer.applyBackground(domains.get(name), a);
     }
@@ -311,21 +319,23 @@ class Router {
    * @param {string} route
    */
   navigate(route) {
-    if (window.location.hash === route)
-      this._processRoute();
-    else
-      window.location.hash = route;
+    if (window.location.search !== route)
+      window.history.pushState({}, route, route);
+    this._processRoute();
   }
 
   /**
    * @return {string}
    */
   route() {
-    return window.location.hash;
+    // Support for old hash-based navigation.
+    if (window.location.hash.length > 1)
+      return '?' + window.location.hash.substring(1);
+    return window.location.search;
   }
 
   _processRoute() {
-    let route = (window.location.hash || '#').substring(1);
+    let route = (window.location.search || '?').substring(1);
     for (let regex of this._routes.keys()) {
       var matches = route.match(regex);
       if (matches) {

@@ -115,7 +115,7 @@ class ProtocolRenderer {
     heading.text(domainName + '.', 'method-domain');
     heading.text(title, 'method-name');
     ProtocolRenderer.applyMarks(item, heading);
-    heading.a('#' + id, '#').classList.add('title-link');
+    heading.a('?' + id, '#').classList.add('title-link');
     return heading;
   }
 
@@ -205,7 +205,7 @@ class ProtocolRenderer {
 
   static renderRef($ref) {
     let a = E.el('a', 'parameter-type');
-    a.href = '#' + $ref;
+    a.href = '?' + $ref;
     a.textContent = $ref;
     return a;
   }
