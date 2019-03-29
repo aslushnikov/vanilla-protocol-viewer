@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!(event.target.nodeName === 'A' && event.target.hostname === window.location.hostname))
       return;
     event.preventDefault();
-    window.app.navigate(event.target.search);
+    window.app.navigate(event.target.pathname);
   }, false);
 
 });
@@ -111,7 +111,7 @@ class App {
     // Assign empty arrays to otherwise undefined fields.
     for (let domain of protocol.domains) {
       domain.commands = domain.commands || [];
-      domain.events = domain.events || [];      
+      domain.events = domain.events || [];
       domain.types = domain.types || [];
       for (let event of domain.events) {
         event.parameters = event.parameters || [];
@@ -157,7 +157,7 @@ class App {
           if (!type)
             continue;
           type.referencedBy.push({
-            type: 'event', 
+            type: 'event',
             name: domain.domain + '.' + event.name
           });
         }
@@ -171,7 +171,7 @@ class App {
           if (!referencedType)
             continue;
           referencedType.referencedBy.push({
-            type: 'type', 
+            type: 'type',
             name: domain.domain + '.' + type.id
           });
         }
@@ -258,7 +258,7 @@ class App {
       this._contentElement.appendChild(renderError(`Unknown domain: ${domain}. Enable experimental domains above?`));
       return;
     }
-    let link = this._sidebarElement.querySelector(`[href='?${domain}']`);
+    let link = this._sidebarElement.querySelector(`[href='/${domain}']`);
     if (link)
       link.classList.add('active-link');
     let render = ProtocolRenderer.renderDomain(this._domains.get(domain));
@@ -290,7 +290,7 @@ class App {
     let sidebar = document.getElementById('sidebar');
     sidebar.textContent = '';
     for (let name of domainNames) {
-      let a = sidebar.a('?' + name, name);
+      let a = sidebar.a('/' + name, name);
       a.classList.add('domain-link');
       ProtocolRenderer.applyBackground(domains.get(name), a);
     }
@@ -319,7 +319,7 @@ class Router {
    * @param {string} route
    */
   navigate(route) {
-    if (window.location.search !== route)
+    if (window.location.pathname !== route)
       window.history.pushState({}, route, route);
     this._processRoute();
   }
@@ -330,12 +330,12 @@ class Router {
   route() {
     // Support for old hash-based navigation.
     if (window.location.hash.length > 1)
-      return '?' + window.location.hash.substring(1);
-    return window.location.search;
+      return window.location.hash.substring(1);
+    return window.location.pathname;
   }
 
   _processRoute() {
-    let route = (window.location.search || '?').substring(1);
+    let route = (window.location.pathname || '/').substring(1);
     for (let regex of this._routes.keys()) {
       var matches = route.match(regex);
       if (matches) {

@@ -118,7 +118,7 @@ class Search {
     let main = this._resultsElement.hbox('search-item', `Navigate Home`);
     main.classList.add('custom-search-result');
     main.classList.add('monospace');
-    main.__route = '?';
+    main.__route = '/';
     return main;
   }
 
@@ -321,7 +321,7 @@ Search.Item = class {
     this.type = itemType;
     this.description = description || '';
     this.title = this.domainName + '.' + this.domainEntry;
-    this.route = `?${domainName}.${domainEntry}`
+    this.route = `/${domainName}.${domainEntry}`
   }
 }
 
