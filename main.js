@@ -336,6 +336,7 @@ class Router {
 
   _processRoute() {
     let route = (window.location.search || '?').substring(1);
+    gtag('config', 'UA-138239427-1', {'page_path': '?' + route});
     for (let regex of this._routes.keys()) {
       var matches = route.match(regex);
       if (matches) {
