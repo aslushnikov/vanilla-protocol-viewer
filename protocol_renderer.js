@@ -127,11 +127,11 @@ class ProtocolRenderer {
       ProtocolRenderer.renderTableOfContentsEntry(domain.domain, type.id, container);
 
     if (domain.commands.length)
-      ProtocolRenderer.renderTableOfContentsSection("Methods", domain.commands, renderEventOrMethodEntry, container)
+      ProtocolRenderer.renderTableOfContentsSection("Methods", domain.commands, renderEventOrMethodEntry, container);
     if (domain.events.length)
-      ProtocolRenderer.renderTableOfContentsSection("Events", domain.events, renderEventOrMethodEntry, container)
+      ProtocolRenderer.renderTableOfContentsSection("Events", domain.events, renderEventOrMethodEntry, container);
     if (domain.types.length)
-      ProtocolRenderer.renderTableOfContentsSection("Types", domain.types, renderTypeEntry, container)
+      ProtocolRenderer.renderTableOfContentsSection("Types", domain.types, renderTypeEntry, container);
   }
 
   static renderTableOfContentsSection(sectionName, entries, renderer, container) {
@@ -142,16 +142,16 @@ class ProtocolRenderer {
       let row = renderer(entry, section);
       ProtocolRenderer.applyMarks(entry, row);
     }
-    return section
+    return section;
   }
 
   static renderTableOfContentsEntry(domainName, name, container) {
-    let row = container.div('div')
+    let row = container.div('div');
     let id = `${domainName}.${name}`;
-    let link = ProtocolRenderer.renderRef(id)
+    let link = ProtocolRenderer.renderRef(id);
     link.classList.add('monospace');
     row.appendChild(link);
-    return row
+    return row;
   }
 
   static renderEventOrMethod(domain, method, isEvent) {
