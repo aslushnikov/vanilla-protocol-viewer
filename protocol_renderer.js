@@ -19,6 +19,7 @@ class ProtocolRenderer {
       let description = header.el('p');
       description.innerHTML = domain.description || '';
       ProtocolRenderer.applyMarks(domain, title);
+      ProtocolRenderer.renderTableOfContents(domain, header)
     }
 
     if (domain.commands.length) {
@@ -40,7 +41,7 @@ class ProtocolRenderer {
     }
 
     if (domain.types.length) {
-      // Render events.
+      // Render types.
       let title = main.el('h3');
       title.textContent = 'Types';
       let container = main.box('box');
@@ -117,6 +118,40 @@ class ProtocolRenderer {
     ProtocolRenderer.applyMarks(item, heading);
     heading.a('?' + id, '#').classList.add('title-link');
     return heading;
+  }
+
+  static renderTableOfContents(domain, container) {
+    let renderEventOrMethodEntry = (method, container) =>
+      ProtocolRenderer.renderTableOfContentsEntry(domain.domain, method.name, container);
+    let renderTypeEntry = (type, container) =>
+      ProtocolRenderer.renderTableOfContentsEntry(domain.domain, type.id, container);
+
+    if (domain.commands.length)
+      ProtocolRenderer.renderTableOfContentsSection("Methods", domain.commands, renderEventOrMethodEntry, container);
+    if (domain.events.length)
+      ProtocolRenderer.renderTableOfContentsSection("Events", domain.events, renderEventOrMethodEntry, container);
+    if (domain.types.length)
+      ProtocolRenderer.renderTableOfContentsSection("Types", domain.types, renderTypeEntry, container);
+  }
+
+  static renderTableOfContentsSection(sectionName, entries, renderer, container) {
+    let title = container.el('h4');
+    title.textContent = sectionName;
+    let section = container.div('div');
+    for (let entry of entries) {
+      let row = renderer(entry, section);
+      ProtocolRenderer.applyMarks(entry, row);
+    }
+    return section;
+  }
+
+  static renderTableOfContentsEntry(domainName, name, container) {
+    let row = container.div('div');
+    let id = `${domainName}.${name}`;
+    let link = ProtocolRenderer.renderRef(id);
+    link.classList.add('monospace');
+    row.appendChild(link);
+    return row;
   }
 
   static renderEventOrMethod(domain, method, isEvent) {
