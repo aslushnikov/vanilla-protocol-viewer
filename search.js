@@ -103,7 +103,7 @@ class Search {
       this._renderMessage('Nothing is found.');
       return;
     }
-    this._resultsElement.innerHTML = '';
+    this._resultsElement.textContent = '';
     if (!query)
       this._addNavigateHomeItem();
     for (let i = 0; i < Math.min(results.length, SEARCH_RENDER_COUNT); ++i)
@@ -145,7 +145,7 @@ class Search {
    * @param {string} text
    */
   _renderMessage(text) {
-    this._resultsElement.innerHTML = '';
+    this._resultsElement.textContent = '';
     this._resultsElement.box('search-results-message')
       .el('h4', '', text);
   }
@@ -255,7 +255,7 @@ function renderSearchResult(searchResult) {
     domainElement.appendChild(renderTextWithMatches(item.title, searchResult.matches, 0, item.domainName.length + 1));
     p1.appendChild(renderTextWithMatches(item.title, searchResult.matches, item.domainName.length + 1, item.title.length));
     let p2 = container.el('div',  'search-item-description');
-    p2.innerHTML = item.description;
+    p2.textContent = item.description;
   }
   main.__route = item.route;
   return main;

@@ -17,7 +17,7 @@ class ProtocolRenderer {
       title.textContent = domain.domain;
 
       let description = header.el('p');
-      description.innerHTML = domain.description || '';
+      description.textContent = domain.description || '';
       ProtocolRenderer.applyMarks(domain, title);
       ProtocolRenderer.renderTableOfContents(domain, header)
     }
@@ -64,7 +64,7 @@ class ProtocolRenderer {
     {
       // Render description.
       let p = main.el('p');
-      p.innerHTML = type.description || '';
+      p.textContent = type.description || '';
     }
     if (type.properties && type.properties.length) {
       // Render parameters.
@@ -162,7 +162,7 @@ class ProtocolRenderer {
     {
       // Render description.
       let p = main.el('p');
-      p.innerHTML = method.description || '';
+      p.textContent = method.description || '';
     }
     if (method.parameters.length) {
       // Render parameters.
@@ -202,9 +202,19 @@ class ProtocolRenderer {
       let descriptions = [];
       if (parameter.description)
         descriptions.push(parameter.description);
-      if (parameter.enum)
-        descriptions.push('Allowed values: ' + parameter.enum.map(value => '<code>' + value + '</code>').join(', ') + '.');
-      description.innerHTML = descriptions.join(' ');
+      description.textContent = descriptions.join(' ');
+      if (parameter.enum) {
+        description.append(' Allowed values: ');
+        parameter.enum.forEach((value, index) => {
+          const code = document.createElement('code');
+          code.textContent = value;
+          description.append(code);
+          if (index < parameter.enum.length - 1)
+            description.append(', ');
+          else
+            description.append('.');
+        });
+      }
       ProtocolRenderer.applyMarks(parameter, description);
     }
     return main;

@@ -279,7 +279,7 @@ class App {
     document.title = 'Vanilla Protocol Viewer';
     this._search.setDefaultValue('');
     this._search.cancelSearch();
-    this._contentElement.innerHTML = '';
+    this._contentElement.textContent = '';
     var template = document.querySelector('#landing');
     var clone = document.importNode(template.content, true);
     this._contentElement.appendChild(clone);
